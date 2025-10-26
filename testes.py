@@ -1,5 +1,5 @@
 from estoque import Estoque
-from medicamento import Medicamento
+from medicamentos import Medicamento
 from datetime import date
 
 estoque = Estoque()

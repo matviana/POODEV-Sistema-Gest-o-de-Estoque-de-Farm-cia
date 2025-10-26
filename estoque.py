@@ -1,4 +1,4 @@
-from medicamento import Medicamento
+from medicamentos import Medicamento
 
 class Estoque:
     def __init__(self):
