@@ -2,6 +2,31 @@
 from database import criar_tabelas
 from medicamentos import Medicamento
 from farmacia import Farmacia  
+from datetime import date, datetime
+
+
+
+
+def mostrar_alertas():
+    """Exibe alertas de medicamentos vencidos ou próximos do vencimento."""
+    vencidos = Medicamento.consultar_vencidos()
+    proximos = Medicamento.consultar_proximos_vencimento(30)
+
+    if vencidos:
+        print("\n  ALERTA: Medicamentos VENCIDOS encontrados:")
+        for m in vencidos:
+            dias_atraso = (date.today() - m[3]).days
+            print(f" {m[1]} | Lote:{m[2]} | Venceu há {dias_atraso} dias (Val:{m[3]})")
+    else:
+        print("\n Nenhum medicamento vencido.")
+
+    if proximos:
+        print("\n ALERTA: Medicamentos próximos do vencimento (até 30 dias):")
+        for m in proximos:
+            dias_faltando = (m[3] - date.today()).days
+            print(f" {m[1]} | Lote:{m[2]} | Faltam {dias_faltando} dias (Val:{m[3]})")
+    else:
+        print("\n Nenhum medicamento prestes a vencer.")
 
 def menu():
     while True:
@@ -12,7 +37,8 @@ def menu():
         print("4 - Deletar por código de barras")
         print("5 - Consultar por nome de medicamento")
         print("6 - Cadastrar Farmácia")              
-        print("7 - Consultar todas as Farmácias")    
+        print("7 - Consultar todas as Farmácias")
+        print("8 - Mostrar alertas de vencimento")    
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -54,7 +80,7 @@ def menu():
             nome = input("Digite parte ou o nome completo do medicamento: ")
             resultados = Medicamento.consultar_por_nome(nome)
             if not resultados:
-                print("Nenhum medicamento encontrado com esse nome.")
+                print("Nenhum medicamento encontrado com esse nome ")
             else:
                 print("\nResultados da busca:")
                 for m in resultados:
@@ -65,8 +91,9 @@ def menu():
             nome = input("Nome da Farmácia: ")
             endereco = input("Endereço: ")
             telefone = input("Telefone: ")
+            cnpj = input("CNPJ : ")
 
-            f = Farmacia(nome, endereco, telefone)
+            f = Farmacia(nome, endereco, telefone, cnpj)
             f.cadastrar()
 
         elif opcao == "7":
@@ -77,6 +104,10 @@ def menu():
                 print("\n=== Farmácias Cadastradas ===")
                 for f in todas:
                     print(f"ID:{f[0]} | Nome:{f[1]} | Endereço:{f[2]} | Telefone:{f[3]}")
+                    
+                    
+        elif opcao == "8":
+            mostrar_alertas()
 
         
         elif opcao == "0":
@@ -88,4 +119,6 @@ def menu():
 
 if __name__ == "__main__":
     criar_tabelas() 
+    print("\n Verificando medicamentos vencidos ou próximos do vencimento: ")
+    mostrar_alertas()
     menu()

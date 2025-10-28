@@ -158,6 +158,55 @@ class Medicamento:
         finally:
             if conn:
                 conn.close()
+                
+                
+    def esta_vencido(self):
+        """Retorna True se o medicamento já passou da validade."""
+        return date.today() > self.validade
+
+    def dias_para_vencer(self):
+        """Retorna quantos dias faltam para o vencimento (negativo se já venceu)."""
+        return (self.validade - date.today()).days
+
+    @staticmethod
+    def consultar_vencidos():
+        """Retorna todos os medicamentos cuja validade já passou."""
+        sql = """
+        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        FROM medicamentos
+        WHERE validade < CURRENT_DATE
+        ORDER BY validade;
+        """
+        conn = None
+        try:
+            conn = conectar_banco()
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                return cur.fetchall()
+        finally:
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def consultar_proximos_vencimento(dias=30):
+        """Retorna medicamentos que vencem nos próximos 'dias' dias."""
+        sql = """
+        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        FROM medicamentos
+        WHERE validade BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '%s days'
+        ORDER BY validade;
+        """
+        conn = None
+        try:
+            conn = conectar_banco()
+            with conn.cursor() as cur:
+                cur.execute(sql, (dias,))
+                return cur.fetchall()
+        finally:
+            if conn:
+                conn.close()
+
+
 
     
 
