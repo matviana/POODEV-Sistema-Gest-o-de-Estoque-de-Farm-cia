@@ -3,6 +3,8 @@ from database import criar_tabelas
 from medicamentos import Medicamento
 from farmacia import Farmacia  
 from datetime import date, datetime
+from estoque import Estoque
+
 
 
 
@@ -38,7 +40,10 @@ def menu():
         print("5 - Consultar por nome de medicamento")
         print("6 - Cadastrar Farmácia")              
         print("7 - Consultar todas as Farmácias")
-        print("8 - Mostrar alertas de vencimento")    
+        print("8 - Mostrar alertas de vencimento") 
+        print("9 - Entrada medicamento - estoque + ")
+        print("10 - Saída Medicamento - estoque -")
+        print("11 - Verificar medicamento com estoque baixo")      
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -108,6 +113,20 @@ def menu():
                     
         elif opcao == "8":
             mostrar_alertas()
+            
+        elif opcao == "9":
+            codigo = input("Código de barras: ")
+            qtd = int(input("Quantidade adicionada: "))
+            Estoque.entrada(codigo, qtd)
+
+        elif opcao == "10":
+            codigo = input("Código de barras: ")
+            qtd = int(input("Quantidade removida: "))
+            Estoque.saida(codigo, qtd)
+
+        elif opcao == "11":
+            Estoque.mostrar_alertas_reposicao()
+
 
         
         elif opcao == "0":

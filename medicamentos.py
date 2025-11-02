@@ -205,6 +205,9 @@ class Medicamento:
         finally:
             if conn:
                 conn.close()
+                
+                
+    
 
 
 
