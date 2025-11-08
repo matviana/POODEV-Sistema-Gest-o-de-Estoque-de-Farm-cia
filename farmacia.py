@@ -42,3 +42,30 @@ class Farmacia:
         finally:
             if conn:
                 conn.close()
+                
+                
+    @staticmethod
+    def deletar_por_cnpj(cnpj):
+        """Deleta uma farmácia com base no CNPJ informado."""
+        sql = "DELETE FROM farmacias WHERE cnpj = %s RETURNING id;"
+        conn = None
+        try:
+            conn = conectar_banco()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql, (cnpj,))
+                    deletado = cur.fetchone()
+            if deletado:
+                print(f" Farmácia com CNPJ {cnpj} deletada com sucesso.")
+                return True
+            else:
+                print("⚠️ Nenhuma farmácia encontrada com esse CNPJ.")
+                return False
+        except Exception as e:
+            print(" Erro ao deletar farmácia:", e)
+            if conn:
+                conn.rollback()
+            return False
+        finally:
+            if conn:
+                conn.close()

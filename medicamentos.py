@@ -65,7 +65,7 @@ class Medicamento:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 rows = cur.fetchall()
-            return rows  # lista de tuplas
+            return rows  
         finally:
             if conn:
                 conn.close()

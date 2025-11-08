@@ -43,7 +43,8 @@ def menu():
         print("8 - Mostrar alertas de vencimento") 
         print("9 - Entrada medicamento - estoque + ")
         print("10 - Saída Medicamento - estoque -")
-        print("11 - Verificar medicamento com estoque baixo")      
+        print("11 - Verificar medicamento com estoque baixo")   
+        print("12 - Deletar Farmácia por CNPJ")   
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -55,7 +56,7 @@ def menu():
             validade = input("Validade (AAAA-MM-DD): ")
             quantidade_minima = int(input("Quantidade mínima: "))
             codigo_barras = input("Código de barras: ")
-            quantidade_estoque = int(input("Quantidade em estoque (opcional, 0): ") or 0)
+            quantidade_estoque = int(input("Quantidade em estoque : ") or 0)
 
             m = Medicamento(nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque)
             m.cadastrar()
@@ -126,6 +127,12 @@ def menu():
 
         elif opcao == "11":
             Estoque.mostrar_alertas_reposicao()
+            
+        elif opcao == "12":
+            cnpj = input("Digite o CNPJ da farmácia que deseja deletar: ")
+            ok = Farmacia.deletar_por_cnpj(cnpj)
+            print("Farmácia deletada com sucesso." if ok else "Nenhuma farmácia encontrada com esse CNPJ.")
+
 
 
         

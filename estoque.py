@@ -75,13 +75,19 @@ class Estoque:
                 rows = cur.fetchall()
         return rows
 
-    @staticmethod
-    def mostrar_alertas_reposicao():
+@staticmethod
+def mostrar_alertas_reposicao():
+    """Mostra medicamentos com estoque abaixo do mínimo, com tratamento de erros."""
+    try:
         reposicoes = Estoque.verificar_reposicao()
+
         if not reposicoes:
             print(" Todos os estoques estão adequados.")
         else:
             print("\n  ALERTA: Medicamentos com estoque baixo:")
             for nome, qtd, min_qtd in reposicoes:
                 print(f" - {nome}: {qtd} unidades (mínimo {min_qtd})")
+
+    except Exception as e:        
+        print(" Erro ao verificar alertas de reposição:", e)
 
