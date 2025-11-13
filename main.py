@@ -45,6 +45,7 @@ def menu():
         print("10 - Saída Medicamento - estoque -")
         print("11 - Verificar medicamento com estoque baixo")   
         print("12 - Deletar Farmácia por CNPJ")   
+        print("13 - Repor automaticamente estoque baixo ")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -132,6 +133,9 @@ def menu():
             cnpj = input("Digite o CNPJ da farmácia que deseja deletar: ")
             ok = Farmacia.deletar_por_cnpj(cnpj)
             print("Farmácia deletada com sucesso." if ok else "Nenhuma farmácia encontrada com esse CNPJ.")
+            
+        elif opcao == "13":
+            Estoque.repor_automaticamente()
 
 
 
