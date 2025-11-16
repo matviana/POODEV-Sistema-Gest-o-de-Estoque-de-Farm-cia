@@ -5,9 +5,7 @@ from psycopg2 import sql
 from psycopg2.extras import DictCursor
 from dotenv import load_dotenv
 
-
-load_dotenv() 
-
+load_dotenv()
 
 DB_HOST = os.getenv("PG_HOST", "localhost")
 DB_PORT = int(os.getenv("PG_PORT", 5432))
@@ -27,8 +25,9 @@ def conectar_banco():
 
 def criar_tabelas():
     """
-    Cria tabelas essenciais: medicamentos e farmacias.
+    Cria tabelas essenciais: medicamentos, farmacias e historico_movimentacoes.
     """
+
     create_medicamentos = """
     CREATE TABLE IF NOT EXISTS medicamentos (
         id SERIAL PRIMARY KEY,
@@ -51,6 +50,17 @@ def criar_tabelas():
     );
     """
 
+    create_historico = """
+    CREATE TABLE IF NOT EXISTS historico_movimentacoes (
+        id SERIAL PRIMARY KEY,
+        id_medicamento INT NOT NULL REFERENCES medicamentos(id) ON DELETE CASCADE,
+        tipo VARCHAR(20) NOT NULL,           -- 'entrada' ou 'saida'
+        quantidade INT NOT NULL,
+        data_movimento TIMESTAMP DEFAULT NOW(),
+        observacao TEXT
+    );
+    """
+
     conn = None
     try:
         conn = conectar_banco()
@@ -58,9 +68,41 @@ def criar_tabelas():
             with conn.cursor() as cur:
                 cur.execute(create_medicamentos)
                 cur.execute(create_farmacias)
-        print("Tabelas 'medicamentos' e 'farmacias' criadas/verificadas com sucesso.")
+                cur.execute(create_historico)
+
+        print("Tabelas criadas/verificadas com sucesso.")
     except Exception as e:
-        print(" Erro ao criar tabelas:", e)
+        print("Erro ao criar tabelas:", e)
+        if conn:
+            conn.rollback()
+        raise
+    finally:
+        if conn:
+            conn.close()
+
+
+
+def registrar_historico(id_medicamento, tipo, quantidade, observacao=None):
+    """
+    Registra uma entrada ou saída de estoque no histórico.
+
+    tipo = 'entrada' ou 'saida'
+    quantidade = valor inteiro positivo
+    """
+    query = """
+        INSERT INTO historico_movimentacoes
+        (id_medicamento, tipo, quantidade, observacao)
+        VALUES (%s, %s, %s, %s);
+    """
+
+    conn = None
+    try:
+        conn = conectar_banco()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(query, (id_medicamento, tipo, quantidade, observacao))
+    except Exception as e:
+        print("Erro ao registrar histórico:", e)
         if conn:
             conn.rollback()
         raise

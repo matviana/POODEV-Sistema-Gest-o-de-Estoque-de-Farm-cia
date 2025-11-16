@@ -4,6 +4,7 @@ from medicamentos import Medicamento
 from farmacia import Farmacia  
 from datetime import date, datetime
 from estoque import Estoque
+from historico import consultar_todas
 
 
 
@@ -46,6 +47,7 @@ def menu():
         print("11 - Verificar medicamento com estoque baixo")   
         print("12 - Deletar Farmácia por CNPJ")   
         print("13 - Repor automaticamente estoque baixo ")
+        print("14 - Ver histórico das movimentações ")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -136,6 +138,32 @@ def menu():
             
         elif opcao == "13":
             Estoque.repor_automaticamente()
+            
+        elif opcao == "14":
+            # debug rápido para confirmar tipo/valor
+            print("DEBUG: executando opção 14")
+
+            try:
+                from historico import consultar_todas
+            except Exception as e:
+                print("Erro ao importar historico:", e)
+                continue
+
+            print("\n=== HISTÓRICO DE MOVIMENTAÇÕES ===")
+            registros = consultar_todas()
+
+            if not registros:
+                print("Nenhuma movimentação registrada ainda.")
+            else:
+                for mov in registros:
+                    # mov: (id, codigo_barras, nome_medicamento, tipo_movimentacao,
+                    #      quantidade, estoque_antes, estoque_depois, data_hora, observacao)
+                    idh, codigo, nome, tipo, quantidade, antes, depois, datahora, obs = mov
+                    print(f"[{datahora}] {tipo} | {nome} | Qtd:{quantidade} | Antes:{antes} | Depois:{depois} | Obs:{obs}")
+
+            
+        
+
 
 
 
@@ -145,7 +173,7 @@ def menu():
             break
 
         else:
-            print("Opção inválida. Tente novamente.")
+          print("Opção inválida. Tente novamente.")
 
 if __name__ == "__main__":
     criar_tabelas() 

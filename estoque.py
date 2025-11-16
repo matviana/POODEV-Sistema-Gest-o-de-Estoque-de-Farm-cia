@@ -1,5 +1,5 @@
 from medicamentos import Medicamento
-from database import conectar_banco
+from database import conectar_banco, registrar_historico
 
 class Estoque:
     def __init__(self):
@@ -19,6 +19,22 @@ class Estoque:
         return [m for m in self.medicamentos if m.precisa_repor()]
 
     
+    @staticmethod
+    def _get_id_medicamento(codigo_barras):
+        sql = "SELECT id FROM medicamentos WHERE codigo_barras = %s;"
+        conn = None
+        try:
+            conn = conectar_banco()
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute(sql, (codigo_barras,))
+                    res = cur.fetchone()
+            return res[0] if res else None
+        except:
+            return None
+        finally:
+            if conn:
+                conn.close()
 
     @staticmethod
     def entrada(codigo_barras, quantidade):
@@ -26,8 +42,9 @@ class Estoque:
         UPDATE medicamentos
         SET quantidade_estoque = quantidade_estoque + %s
         WHERE codigo_barras = %s
-        RETURNING nome, quantidade_estoque;
+        RETURNING id, nome, quantidade_estoque;
         """
+
         try:
             conn = conectar_banco()
             with conn:
@@ -37,20 +54,27 @@ class Estoque:
             conn.close()
 
             if result:
-                print(f" Entrada registrada: +{quantidade} unidades de '{result[0]}'. Estoque atual: {result[1]}")
+                id_medicamento, nome, qtd_atual = result
+
+            
+                registrar_historico(id_medicamento, "entrada", quantidade, "Entrada manual de estoque")
+
+                print(f" Entrada registrada: +{quantidade} unidades de '{nome}'. Estoque atual: {qtd_atual}")
             else:
                 print(" Medicamento não encontrado.")
         except Exception as e:
             print(" Erro ao registrar entrada:", e)
 
+   
     @staticmethod
     def saida(codigo_barras, quantidade):
         sql = """
         UPDATE medicamentos
         SET quantidade_estoque = quantidade_estoque - %s
         WHERE codigo_barras = %s AND quantidade_estoque >= %s
-        RETURNING nome, quantidade_estoque;
+        RETURNING id, nome, quantidade_estoque;
         """
+
         try:
             conn = conectar_banco()
             with conn:
@@ -60,7 +84,12 @@ class Estoque:
             conn.close()
 
             if result:
-                print(f" Saída registrada: -{quantidade} unidades de '{result[0]}'. Estoque atual: {result[1]}")
+                id_medicamento, nome, qtd_atual = result
+
+                
+                registrar_historico(id_medicamento, "saida", quantidade, "Saída manual de estoque")
+
+                print(f" Saída registrada: -{quantidade} unidades de '{nome}'. Estoque atual: {qtd_atual}")
             else:
                 print(" Estoque insuficiente ou medicamento não encontrado.")
         except Exception as e:
@@ -103,13 +132,11 @@ class Estoque:
         except Exception as e:
             print(" Erro ao verificar alertas de reposição:", e)
 
-  
-
     @staticmethod
     def repor_automaticamente():
         """
         Reposição automática de medicamentos com estoque abaixo do mínimo.
-        Reabastece até o dobro da quantidade mínima
+        Reabastece até o dobro da quantidade mínima.
         """
         try:
             reposicoes = Estoque.verificar_reposicao()
@@ -130,9 +157,21 @@ class Estoque:
                                 WHERE nome = %s
                                 RETURNING id;
                             """, (nova_qtd, nome))
+
+                            result = cur.fetchone()
+                            id_medicamento = result[0] if result else None
+
+                            if id_medicamento:
+                                registrar_historico(
+                                    id_medicamento,
+                                    "entrada",
+                                    adicionar,
+                                    "Reposição automática"
+                                )
+
                             print(f" Reposição automática: '{nome}' atualizado para {nova_qtd} unidades (+{adicionar}).")
 
-            print("\n  Reposição automática concluída .")
+            print("\n  Reposição automática concluída.")
         except Exception as e:
             print(" Erro durante a reposição automática:", e)
         finally:
