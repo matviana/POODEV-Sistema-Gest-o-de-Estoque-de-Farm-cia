@@ -1,5 +1,6 @@
 from medicamentos import Medicamento
-from database import conectar_banco, registrar_historico
+from database import conectar_banco, registrar_historico, salvar_receita_medicamento
+import os
 
 class Estoque:
     def __init__(self):
@@ -18,7 +19,6 @@ class Estoque:
         """Verifica apenas os medicamentos carregados em memória."""
         return [m for m in self.medicamentos if m.precisa_repor()]
 
-    
     @staticmethod
     def _get_id_medicamento(codigo_barras):
         sql = "SELECT id FROM medicamentos WHERE codigo_barras = %s;"
@@ -56,8 +56,12 @@ class Estoque:
             if result:
                 id_medicamento, nome, qtd_atual = result
 
-            
-                registrar_historico(id_medicamento, "entrada", quantidade, "Entrada manual de estoque")
+                registrar_historico(
+                    id_medicamento, 
+                    "entrada", 
+                    quantidade, 
+                    "Entrada manual de estoque"
+                )
 
                 print(f" Entrada registrada: +{quantidade} unidades de '{nome}'. Estoque atual: {qtd_atual}")
             else:
@@ -65,9 +69,12 @@ class Estoque:
         except Exception as e:
             print(" Erro ao registrar entrada:", e)
 
-   
     @staticmethod
-    def saida(codigo_barras, quantidade):
+    def saida(codigo_barras, quantidade, caminho_receita=None):
+        """
+        Agora aceita caminho_receita para medicamentos controlados.
+        Se for controlado, o main.py garante que o caminho é válido.
+        """
         sql = """
         UPDATE medicamentos
         SET quantidade_estoque = quantidade_estoque - %s
@@ -76,6 +83,7 @@ class Estoque:
         """
 
         try:
+            # Atualizar estoque
             conn = conectar_banco()
             with conn:
                 with conn.cursor() as cur:
@@ -83,15 +91,32 @@ class Estoque:
                     result = cur.fetchone()
             conn.close()
 
-            if result:
-                id_medicamento, nome, qtd_atual = result
-
-                
-                registrar_historico(id_medicamento, "saida", quantidade, "Saída manual de estoque")
-
-                print(f" Saída registrada: -{quantidade} unidades de '{nome}'. Estoque atual: {qtd_atual}")
-            else:
+            if not result:
                 print(" Estoque insuficiente ou medicamento não encontrado.")
+                return
+
+            id_medicamento, nome, qtd_atual = result
+
+            # ---- NOVO: salvar foto da receita no banco ----
+            observacao = "Saída manual de estoque"
+
+            if caminho_receita:
+                try:
+                    salvar_receita_medicamento(id_medicamento, caminho_receita)
+                    observacao += f" | receita: {caminho_receita}"
+                except Exception as e:
+                    print(f" Erro ao salvar receita: {e}")
+
+            # Registrar no histórico
+            registrar_historico(
+                id_medicamento,
+                "saida",
+                quantidade,
+                observacao
+            )
+
+            print(f" Saída registrada: -{quantidade} unidades de '{nome}'. Estoque atual: {qtd_atual}")
+
         except Exception as e:
             print(" Erro ao registrar saída:", e)
 
@@ -135,7 +160,7 @@ class Estoque:
     @staticmethod
     def repor_automaticamente():
         """
-        Reposição automática de medicamentos com estoque abaixo do mínimo.
+        Reposição automática de medicamentos com estoque baixo.
         Reabastece até o dobro da quantidade mínima.
         """
         try:
@@ -177,4 +202,3 @@ class Estoque:
         finally:
             if 'conn' in locals() and conn:
                 conn.close()
-

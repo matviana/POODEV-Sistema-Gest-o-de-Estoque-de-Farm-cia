@@ -1,7 +1,6 @@
 
 import os
 import psycopg2
-from psycopg2 import sql
 from psycopg2.extras import DictCursor
 from dotenv import load_dotenv
 
@@ -26,6 +25,7 @@ def conectar_banco():
 def criar_tabelas():
     """
     Cria tabelas essenciais: medicamentos, farmacias e historico_movimentacoes.
+    Agora suporta medicamentos controlados e caminhos de receita.
     """
 
     create_medicamentos = """
@@ -36,7 +36,8 @@ def criar_tabelas():
         validade DATE,
         quantidade_minima INT DEFAULT 0,
         codigo_barras VARCHAR(50) UNIQUE,
-        quantidade_estoque INT DEFAULT 0
+        quantidade_estoque INT DEFAULT 0,
+        controlado BOOLEAN DEFAULT FALSE     -- novo campo
     );
     """
 
@@ -54,10 +55,11 @@ def criar_tabelas():
     CREATE TABLE IF NOT EXISTS historico_movimentacoes (
         id SERIAL PRIMARY KEY,
         id_medicamento INT NOT NULL REFERENCES medicamentos(id) ON DELETE CASCADE,
-        tipo VARCHAR(20) NOT NULL,           -- 'entrada' ou 'saida'
+        tipo VARCHAR(20) NOT NULL,             
         quantidade INT NOT NULL,
         data_movimento TIMESTAMP DEFAULT NOW(),
-        observacao TEXT
+        observacao TEXT,
+        caminho_receita TEXT                 -- novo campo
     );
     """
 
@@ -81,18 +83,16 @@ def criar_tabelas():
             conn.close()
 
 
-
-def registrar_historico(id_medicamento, tipo, quantidade, observacao=None):
+def registrar_historico(id_medicamento, tipo, quantidade, observacao=None, caminho_receita=None):
     """
     Registra uma entrada ou saída de estoque no histórico.
-
-    tipo = 'entrada' ou 'saida'
-    quantidade = valor inteiro positivo
+    Agora aceita caminho_receita para medicamentos controlados.
     """
+
     query = """
         INSERT INTO historico_movimentacoes
-        (id_medicamento, tipo, quantidade, observacao)
-        VALUES (%s, %s, %s, %s);
+        (id_medicamento, tipo, quantidade, observacao, caminho_receita)
+        VALUES (%s, %s, %s, %s, %s);
     """
 
     conn = None
@@ -100,7 +100,13 @@ def registrar_historico(id_medicamento, tipo, quantidade, observacao=None):
         conn = conectar_banco()
         with conn:
             with conn.cursor() as cur:
-                cur.execute(query, (id_medicamento, tipo, quantidade, observacao))
+                cur.execute(query, (
+                    id_medicamento,
+                    tipo,
+                    quantidade,
+                    observacao,
+                    caminho_receita
+                ))
     except Exception as e:
         print("Erro ao registrar histórico:", e)
         if conn:
@@ -109,4 +115,3 @@ def registrar_historico(id_medicamento, tipo, quantidade, observacao=None):
     finally:
         if conn:
             conn.close()
-

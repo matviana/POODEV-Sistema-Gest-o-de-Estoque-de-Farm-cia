@@ -5,9 +5,7 @@ from farmacia import Farmacia
 from datetime import date, datetime
 from estoque import Estoque
 from historico import consultar_todas
-
-
-
+import os
 
 
 def mostrar_alertas():
@@ -31,6 +29,7 @@ def mostrar_alertas():
     else:
         print("\n Nenhum medicamento prestes a vencer.")
 
+
 def menu():
     while True:
         print("\n=== SISTEMA DE FARMÁCIA ===")
@@ -52,7 +51,9 @@ def menu():
 
         opcao = input("Escolha uma opção: ")
 
-       
+        # -----------------------------
+        # 1 - CADASTRAR MEDICAMENTO
+        # -----------------------------
         if opcao == "1":
             nome = input("Nome: ")
             lote = input("Lote: ")
@@ -64,38 +65,53 @@ def menu():
             m = Medicamento(nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque)
             m.cadastrar()
 
+        # -----------------------------
         elif opcao == "2":
             todos = Medicamento.consultar_todos()
             if not todos:
                 print("Nenhum medicamento cadastrado.")
             else:
                 for m in todos:
-                    print(f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]}")
+                    print(
+                        f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | "
+                        f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
+                    )
 
+        # -----------------------------
         elif opcao == "3":
             codigo = input("Código de barras: ")
             m = Medicamento.consultar_por_codigo(codigo)
             if not m:
                 print("Não encontrado.")
             else:
-                print(f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]}")
+                print(
+                    f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | "
+                    f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
+                )
 
+        # -----------------------------
         elif opcao == "4":
             codigo = input("Código de barras: ")
             ok = Medicamento.deletar_por_codigo(codigo)
             print("Deletado." if ok else "Nada a deletar.")
 
+        # -----------------------------
         elif opcao == "5":
             nome = input("Digite parte ou o nome completo do medicamento: ")
             resultados = Medicamento.consultar_por_nome(nome)
             if not resultados:
-                print("Nenhum medicamento encontrado com esse nome ")
+                print("Nenhum medicamento encontrado com esse nome.")
             else:
                 print("\nResultados da busca:")
                 for m in resultados:
-                    print(f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]}")
+                    print(
+                        f"ID:{m[0]} | Nome:{m[1]} | Lote:{m[2]} | Val:{m[3]} | "
+                        f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
+                    )
 
-       
+        # -----------------------------
+        # 6 - Cadastrar Farmácia
+        # -----------------------------
         elif opcao == "6":
             nome = input("Nome da Farmácia: ")
             endereco = input("Endereço: ")
@@ -105,6 +121,7 @@ def menu():
             f = Farmacia(nome, endereco, telefone, cnpj)
             f.cadastrar()
 
+        # -----------------------------
         elif opcao == "7":
             todas = Farmacia.consultar_todas()
             if not todas:
@@ -113,42 +130,59 @@ def menu():
                 print("\n=== Farmácias Cadastradas ===")
                 for f in todas:
                     print(f"ID:{f[0]} | Nome:{f[1]} | Endereço:{f[2]} | Telefone:{f[3]}")
-                    
-                    
+
+        # -----------------------------
         elif opcao == "8":
             mostrar_alertas()
-            
+
+        # -----------------------------
         elif opcao == "9":
             codigo = input("Código de barras: ")
             qtd = int(input("Quantidade adicionada: "))
             Estoque.entrada(codigo, qtd)
 
+        # -----------------------------
+        # 10 - SAÍDA COM RECEITA SE NECESSÁRIO
+        # -----------------------------
         elif opcao == "10":
             codigo = input("Código de barras: ")
             qtd = int(input("Quantidade removida: "))
-            Estoque.saida(codigo, qtd)
 
+            m = Medicamento.consultar_por_codigo(codigo)
+
+            if not m:
+                print("Medicamento não encontrado.")
+                continue
+
+            eh_controlado = bool(m[7])  # coluna receita_obrigatoria
+            caminho_receita = None
+
+            if eh_controlado:
+                print("\n Este medicamento é CONTROLADO e exige receita!")
+                caminho_receita = input("Digite o caminho da imagem da receita (jpg/png/pdf): ").strip()
+
+                if not os.path.exists(caminho_receita):
+                    print("Arquivo não encontrado. Operação cancelada.")
+                    continue
+
+            Estoque.saida(codigo, qtd, caminho_receita)
+
+        # -----------------------------
         elif opcao == "11":
             Estoque.mostrar_alertas_reposicao()
-            
+
+        # -----------------------------
         elif opcao == "12":
             cnpj = input("Digite o CNPJ da farmácia que deseja deletar: ")
             ok = Farmacia.deletar_por_cnpj(cnpj)
             print("Farmácia deletada com sucesso." if ok else "Nenhuma farmácia encontrada com esse CNPJ.")
-            
+
+        # -----------------------------
         elif opcao == "13":
             Estoque.repor_automaticamente()
-            
+
+        # -----------------------------
         elif opcao == "14":
-            # debug rápido para confirmar tipo/valor
-            print("DEBUG: executando opção 14")
-
-            try:
-                from historico import consultar_todas
-            except Exception as e:
-                print("Erro ao importar historico:", e)
-                continue
-
             print("\n=== HISTÓRICO DE MOVIMENTAÇÕES ===")
             registros = consultar_todas()
 
@@ -156,24 +190,18 @@ def menu():
                 print("Nenhuma movimentação registrada ainda.")
             else:
                 for mov in registros:
-                    # mov: (id, codigo_barras, nome_medicamento, tipo_movimentacao,
-                    #      quantidade, estoque_antes, estoque_depois, data_hora, observacao)
                     idh, codigo, nome, tipo, quantidade, antes, depois, datahora, obs = mov
-                    print(f"[{datahora}] {tipo} | {nome} | Qtd:{quantidade} | Antes:{antes} | Depois:{depois} | Obs:{obs}")
+                    print(f"[{datahora}] {tipo} | {nome} | Qtd:{quantidade} | "
+                          f"Antes:{antes} | Depois:{depois} | Obs:{obs}")
 
-            
-        
-
-
-
-
-        
+        # -----------------------------
         elif opcao == "0":
             print("Encerrando o sistema...")
             break
 
         else:
-          print("Opção inválida. Tente novamente.")
+            print("Opção inválida. Tente novamente.")
+
 
 if __name__ == "__main__":
     criar_tabelas() 

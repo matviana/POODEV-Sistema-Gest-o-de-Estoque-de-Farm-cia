@@ -3,11 +3,17 @@ from database import conectar_banco
 from datetime import date, datetime
 
 class Medicamento:
-    def __init__(self, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque=0, id_medicamento=None):
+    def __init__(
+        self, nome, lote, validade, quantidade_minima,
+        codigo_barras, quantidade_estoque=0,
+        id_medicamento=None, receita_obrigatoria=False
+    ):
         """
         validade: pode ser datetime.date ou string 'AAAA-MM-DD'
+        receita_obrigatoria: apenas usado por medicamentos controlados.
         """
-        # parse validade se string
+
+        # parse da validade
         if isinstance(validade, str):
             try:
                 self.validade = datetime.strptime(validade, "%Y-%m-%d").date()
@@ -23,11 +29,15 @@ class Medicamento:
         self.codigo_barras = codigo_barras
         self.quantidade_estoque = int(quantidade_estoque)
 
-    
+        # Campo novo — medicamentos normais usam sempre False
+        self.receita_obrigatoria = bool(receita_obrigatoria)
+
+
     def cadastrar(self):
         sql = """
-        INSERT INTO medicamentos (nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO medicamentos 
+        (nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque, receita_obrigatoria)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         RETURNING id;
         """
         conn = None
@@ -38,10 +48,10 @@ class Medicamento:
                     cur.execute(sql, (
                         self.nome, self.lote, self.validade,
                         self.quantidade_minima, self.codigo_barras,
-                        self.quantidade_estoque
+                        self.quantidade_estoque, self.receita_obrigatoria
                     ))
-                    newid = cur.fetchone()[0]
-                    self.id_medicamento = newid
+                    self.id_medicamento = cur.fetchone()[0]
+
             print(f" Medicamento '{self.nome}' cadastrado com id {self.id_medicamento}.")
         except Exception as e:
             print(" Erro ao cadastrar medicamento:", e)
@@ -52,10 +62,12 @@ class Medicamento:
             if conn:
                 conn.close()
 
+
     @staticmethod
     def consultar_todos():
         sql = """
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        SELECT id, nome, lote, validade, quantidade_minima,
+               codigo_barras, quantidade_estoque, receita_obrigatoria
         FROM medicamentos
         ORDER BY nome;
         """
@@ -64,16 +76,17 @@ class Medicamento:
             conn = conectar_banco()
             with conn.cursor() as cur:
                 cur.execute(sql)
-                rows = cur.fetchall()
-            return rows  
+                return cur.fetchall()
         finally:
             if conn:
                 conn.close()
 
+
     @staticmethod
     def consultar_por_codigo(codigo_barras):
         sql = """
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        SELECT id, nome, lote, validade, quantidade_minima,
+               codigo_barras, quantidade_estoque, receita_obrigatoria
         FROM medicamentos
         WHERE codigo_barras = %s;
         """
@@ -82,20 +95,17 @@ class Medicamento:
             conn = conectar_banco()
             with conn.cursor() as cur:
                 cur.execute(sql, (codigo_barras,))
-                row = cur.fetchone()
-            return row
+                return cur.fetchone()
         finally:
             if conn:
                 conn.close()
 
+
     @staticmethod
     def consultar_por_nome(nome):
-        """
-        Consulta medicamentos pelo nome (parcial ou completo).
-        Usa ILIKE para não diferenciar maiúsculas/minúsculas.
-        """
         sql = """
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        SELECT id, nome, lote, validade, quantidade_minima,
+               codigo_barras, quantidade_estoque, receita_obrigatoria
         FROM medicamentos
         WHERE nome ILIKE %s
         ORDER BY nome;
@@ -105,20 +115,23 @@ class Medicamento:
             conn = conectar_banco()
             with conn.cursor() as cur:
                 cur.execute(sql, (f"%{nome}%",))
-                rows = cur.fetchall()
-            return rows
+                return cur.fetchall()
         finally:
             if conn:
                 conn.close()
 
+
     def atualizar(self):
         if not self.id_medicamento:
-            raise ValueError("Medicamento sem id. Use consultar_por_codigo ou informe id antes de atualizar.")
+            raise ValueError("Medicamento sem id definido para atualização.")
+
         sql = """
         UPDATE medicamentos
-        SET nome=%s, lote=%s, validade=%s, quantidade_minima=%s, codigo_barras=%s, quantidade_estoque=%s
+        SET nome=%s, lote=%s, validade=%s, quantidade_minima=%s,
+            codigo_barras=%s, quantidade_estoque=%s, receita_obrigatoria=%s
         WHERE id=%s;
         """
+
         conn = None
         try:
             conn = conectar_banco()
@@ -127,7 +140,8 @@ class Medicamento:
                     cur.execute(sql, (
                         self.nome, self.lote, self.validade,
                         self.quantidade_minima, self.codigo_barras,
-                        self.quantidade_estoque, self.id_medicamento
+                        self.quantidade_estoque, self.receita_obrigatoria,
+                        self.id_medicamento
                     ))
             print(f" Medicamento id {self.id_medicamento} atualizado.")
         except Exception as e:
@@ -138,6 +152,7 @@ class Medicamento:
         finally:
             if conn:
                 conn.close()
+
 
     @staticmethod
     def deletar_por_codigo(codigo_barras):
@@ -158,21 +173,20 @@ class Medicamento:
         finally:
             if conn:
                 conn.close()
-                
-                
+
+
+    # ===== Funções relacionadas à validade =====
     def esta_vencido(self):
-        """Retorna True se o medicamento já passou da validade."""
         return date.today() > self.validade
 
     def dias_para_vencer(self):
-        """Retorna quantos dias faltam para o vencimento (negativo se já venceu)."""
         return (self.validade - date.today()).days
 
     @staticmethod
     def consultar_vencidos():
-        """Retorna todos os medicamentos cuja validade já passou."""
         sql = """
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        SELECT id, nome, lote, validade, quantidade_minima,
+               codigo_barras, quantidade_estoque, receita_obrigatoria
         FROM medicamentos
         WHERE validade < CURRENT_DATE
         ORDER BY validade;
@@ -189,9 +203,9 @@ class Medicamento:
 
     @staticmethod
     def consultar_proximos_vencimento(dias=30):
-        """Retorna medicamentos que vencem nos próximos 'dias' dias."""
         sql = """
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque
+        SELECT id, nome, lote, validade, quantidade_minima,
+               codigo_barras, quantidade_estoque, receita_obrigatoria
         FROM medicamentos
         WHERE validade BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '%s days'
         ORDER BY validade;
@@ -205,21 +219,14 @@ class Medicamento:
         finally:
             if conn:
                 conn.close()
-                
-                
-    
 
-
-
-    
 
     def verificar_validade(self):
-        """Retorna o número de dias até o vencimento."""
         return (self.validade - date.today()).days
 
     def precisa_repor(self):
-        """Retorna True se o estoque está abaixo ou igual ao mínimo."""
         return self.quantidade_estoque <= self.quantidade_minima
+
 
 
 
@@ -230,5 +237,9 @@ class MedicamentoControlado(Medicamento):
         codigo_barras, quantidade_estoque=0,
         receita_obrigatoria=True, id_medicamento=None
     ):
-        super().__init__(nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque, id_medicamento)
-        self.receita_obrigatoria = bool(receita_obrigatoria)
+        super().__init__(
+            nome, lote, validade, quantidade_minima,
+            codigo_barras, quantidade_estoque,
+            id_medicamento=id_medicamento,
+            receita_obrigatoria=True
+        )
