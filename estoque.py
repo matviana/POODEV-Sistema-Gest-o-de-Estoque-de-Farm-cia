@@ -97,7 +97,7 @@ class Estoque:
 
             id_medicamento, nome, qtd_atual = result
 
-            # ---- NOVO: salvar foto da receita no banco ----
+           
             observacao = "Saída manual de estoque"
 
             if caminho_receita:
@@ -107,7 +107,7 @@ class Estoque:
                 except Exception as e:
                     print(f" Erro ao salvar receita: {e}")
 
-            # Registrar no histórico
+            
             registrar_historico(
                 id_medicamento,
                 "saida",

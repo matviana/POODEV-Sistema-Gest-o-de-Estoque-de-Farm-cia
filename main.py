@@ -47,13 +47,12 @@ def menu():
         print("12 - Deletar Farmácia por CNPJ")   
         print("13 - Repor automaticamente estoque baixo ")
         print("14 - Ver histórico das movimentações ")
+        print("15 - Relatório dos Medicamentos mais vendidos do mês")
         print("0 - Sair")
 
         opcao = input("Escolha uma opção: ")
 
-        # -----------------------------
-        # 1 - CADASTRAR MEDICAMENTO
-        # -----------------------------
+     
         if opcao == "1":
             nome = input("Nome: ")
             lote = input("Lote: ")
@@ -65,7 +64,7 @@ def menu():
             m = Medicamento(nome, lote, validade, quantidade_minima, codigo_barras, quantidade_estoque)
             m.cadastrar()
 
-        # -----------------------------
+        
         elif opcao == "2":
             todos = Medicamento.consultar_todos()
             if not todos:
@@ -77,7 +76,7 @@ def menu():
                         f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
                     )
 
-        # -----------------------------
+     
         elif opcao == "3":
             codigo = input("Código de barras: ")
             m = Medicamento.consultar_por_codigo(codigo)
@@ -89,13 +88,13 @@ def menu():
                     f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
                 )
 
-        # -----------------------------
+        
         elif opcao == "4":
             codigo = input("Código de barras: ")
             ok = Medicamento.deletar_por_codigo(codigo)
             print("Deletado." if ok else "Nada a deletar.")
 
-        # -----------------------------
+       
         elif opcao == "5":
             nome = input("Digite parte ou o nome completo do medicamento: ")
             resultados = Medicamento.consultar_por_nome(nome)
@@ -109,9 +108,7 @@ def menu():
                         f"Min:{m[4]} | Cod:{m[5]} | Qtd:{m[6]} | Controlado:{m[7]}"
                     )
 
-        # -----------------------------
-        # 6 - Cadastrar Farmácia
-        # -----------------------------
+       
         elif opcao == "6":
             nome = input("Nome da Farmácia: ")
             endereco = input("Endereço: ")
@@ -121,7 +118,6 @@ def menu():
             f = Farmacia(nome, endereco, telefone, cnpj)
             f.cadastrar()
 
-        # -----------------------------
         elif opcao == "7":
             todas = Farmacia.consultar_todas()
             if not todas:
@@ -131,19 +127,17 @@ def menu():
                 for f in todas:
                     print(f"ID:{f[0]} | Nome:{f[1]} | Endereço:{f[2]} | Telefone:{f[3]}")
 
-        # -----------------------------
+       
         elif opcao == "8":
             mostrar_alertas()
 
-        # -----------------------------
+       
         elif opcao == "9":
             codigo = input("Código de barras: ")
             qtd = int(input("Quantidade adicionada: "))
             Estoque.entrada(codigo, qtd)
 
-        # -----------------------------
-        # 10 - SAÍDA COM RECEITA SE NECESSÁRIO
-        # -----------------------------
+        
         elif opcao == "10":
             codigo = input("Código de barras: ")
             qtd = int(input("Quantidade removida: "))
@@ -167,21 +161,21 @@ def menu():
 
             Estoque.saida(codigo, qtd, caminho_receita)
 
-        # -----------------------------
+      
         elif opcao == "11":
             Estoque.mostrar_alertas_reposicao()
 
-        # -----------------------------
+        
         elif opcao == "12":
             cnpj = input("Digite o CNPJ da farmácia que deseja deletar: ")
             ok = Farmacia.deletar_por_cnpj(cnpj)
             print("Farmácia deletada com sucesso." if ok else "Nenhuma farmácia encontrada com esse CNPJ.")
 
-        # -----------------------------
+        
         elif opcao == "13":
             Estoque.repor_automaticamente()
 
-        # -----------------------------
+        
         elif opcao == "14":
             print("\n=== HISTÓRICO DE MOVIMENTAÇÕES ===")
             registros = consultar_todas()
@@ -194,7 +188,25 @@ def menu():
                     print(f"[{datahora}] {tipo} | {nome} | Qtd:{quantidade} | "
                           f"Antes:{antes} | Depois:{depois} | Obs:{obs}")
 
-        # -----------------------------
+        
+        elif opcao == "15":
+            print("\n=== RELATÓRIO: MEDICAMENTOS MAIS VENDIDOS DO MÊS ===")
+
+            try:
+                from historico import consultar_mais_vendidos_mes
+                resultados = consultar_mais_vendidos_mes()
+            except Exception as e:
+                print("Erro ao gerar relatório:", e)
+                continue
+
+            if not resultados:
+                print("Nenhuma venda registrada neste mês.")
+            else:
+                for nome, total in resultados:
+                    print(f"{nome} — {total} unidades vendidas")
+
+
+
         elif opcao == "0":
             print("Encerrando o sistema...")
             break

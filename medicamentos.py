@@ -13,7 +13,7 @@ class Medicamento:
         receita_obrigatoria: apenas usado por medicamentos controlados.
         """
 
-        # parse da validade
+        
         if isinstance(validade, str):
             try:
                 self.validade = datetime.strptime(validade, "%Y-%m-%d").date()
@@ -29,7 +29,7 @@ class Medicamento:
         self.codigo_barras = codigo_barras
         self.quantidade_estoque = int(quantidade_estoque)
 
-        # Campo novo — medicamentos normais usam sempre False
+         #medicamentos normais usam sempre False
         self.receita_obrigatoria = bool(receita_obrigatoria)
 
 
@@ -230,7 +230,7 @@ class Medicamento:
 
 
 
-
+                # relação de herança de métodos e atributos da superclasse Medicamento , medicamento controlado precisa de receita para ser vendido
 class MedicamentoControlado(Medicamento):
     def __init__(
         self, nome, lote, validade, quantidade_minima,

@@ -59,7 +59,7 @@ class Farmacia:
                 print(f" Farmácia com CNPJ {cnpj} deletada com sucesso.")
                 return True
             else:
-                print("⚠️ Nenhuma farmácia encontrada com esse CNPJ.")
+                print(" Nenhuma farmácia encontrada com esse CNPJ.")
                 return False
         except Exception as e:
             print(" Erro ao deletar farmácia:", e)

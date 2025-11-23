@@ -172,3 +172,33 @@ def consultar_por_tipo(tipo: str, limit: int = 100) -> List[Tuple]:
     finally:
         if conn:
             conn.close()
+
+
+
+
+def consultar_mais_vendidos_mes(mes=None, ano=None):
+    if mes is None:
+        mes = datetime.today().month
+    if ano is None:
+        ano = datetime.today().year
+
+    sql = """
+        SELECT 
+            m.nome,
+            SUM(h.quantidade) AS total_vendido
+        FROM historico h
+        JOIN medicamentos m ON m.id = h.id_medicamento
+        WHERE h.tipo_movimentacao = 'saida'
+          AND EXTRACT(MONTH FROM h.data_hora) = %s
+          AND EXTRACT(YEAR  FROM h.data_hora) = %s
+        GROUP BY m.nome
+        ORDER BY total_vendido DESC;
+    """
+
+    conn = conectar_banco()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (mes, ano))
+            return cur.fetchall()  # lista de (nome, total_vendido)
+    finally:
+        conn.close()
