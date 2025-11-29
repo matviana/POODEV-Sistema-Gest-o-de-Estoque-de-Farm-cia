@@ -2,19 +2,22 @@ import numpy as np
 from sklearn.neural_network import MLPRegressor
 import pickle
 import os
+from datetime import datetime
 
 
 class RedeNeuralDemanda:
     """
     Rede neural simples para previsão de demanda futura.
-    Etapa 1: Apenas histórico de vendas mensais.
+    Critério 1: Histórico de vendas mensais.
+    Critério 2: Sazonalidade (mês do ano).
+    Critério 3: Eventos epidemiológicos (surtos, epidemias e pandemias).
     """
 
     def __init__(self, modelo_path="modelo_demanda.pkl"):
         self.modelo_path = modelo_path
         self.modelo = None
 
-        # Se já existir modelo treinado, carregue.
+        
         if os.path.exists(self.modelo_path):
             self._carregar_modelo()
 
@@ -26,48 +29,80 @@ class RedeNeuralDemanda:
         with open(self.modelo_path, "wb") as f:
             pickle.dump(self.modelo, f)
 
-    def treinar_historico(self, vendas_mensais):
+    
+    # TREINAMENTO COM SAZONALIDADE + EVENTOS EPIDEMIOLÓGICOS
+    
+    def treinar_com_eventos(self, vendas_mensais, eventos_mensais):
         """
-        Treina a rede neural apenas com histórico de vendas mensais.
-        vendas_mensais = [12 valores] por exemplo.
+        Treina a rede considerando:
+        - histórico dos últimos 3 meses
+        - mês do ano (sazonalidade)
+        - intensidade de eventos epidemiológicos (0 a 1)
+
+        vendas_mensais: lista de 12 valores (jan → dez)
+        eventos_mensais: lista de valores entre 0 e 1
         """
 
-        # Transformar em formato de treino:
-        # Ex: usar janelas de 3 meses → prever o próximo mês.
+        if len(vendas_mensais) < 12 or len(eventos_mensais) < 12:
+            raise Exception("São necessários 12 valores de vendas e 12 valores de eventos.")
+
         X = []
         y = []
 
-        # Exemplo: (jan, fev, mar) → prever abril
         for i in range(len(vendas_mensais) - 3):
-            X.append(vendas_mensais[i:i+3])
-            y.append(vendas_mensais[i+3])
+            ultimos_3 = vendas_mensais[i:i+3]
+
+            # Índice do mês que será previsto (0 a 11)
+            indice_mes_previsto = (i + 3) % 12
+
+            # Normalização do mês
+            mes_normalizado = (indice_mes_previsto + 1) / 12
+
+            # Intensidade do evento epidemiológico (0 a 1)
+            evento = eventos_mensais[indice_mes_previsto]
+
+            # Entrada completa
+            entrada = ultimos_3 + [mes_normalizado, evento]
+
+            X.append(entrada)
+            y.append(vendas_mensais[i + 3])
 
         X = np.array(X)
         y = np.array(y)
 
-        # Criando modelo MLP
+      
         self.modelo = MLPRegressor(
-            hidden_layer_sizes=(16, 16),
+            hidden_layer_sizes=(64, 64),
             activation='relu',
             solver='adam',
-            max_iter=2000,
+            max_iter=4000,
             random_state=42
         )
 
         self.modelo.fit(X, y)
         self._salvar_modelo()
-        print("Modelo treinado e salvo com sucesso usando apenas histórico de vendas.")
 
-    def prever_proximo_mes(self, ultimos_3_meses):
+        print("Modelo treinado com histórico + sazonalidade + eventos epidemiológicos.")
+
+    
+    # PREVISÃO COM SAZONALIDADE + EVENTOS EPIDEMIOLÓGICOS
+    
+    def prever_proximo_mes_eventos(self, ultimos_3_meses, mes_atual, intensidade_evento):
         """
-        Recebe: [v1, v2, v3]
-        Retorna previsão do próximo mês.
+        ultimos_3_meses: [v1, v2, v3]
+        mes_atual: mês desejado (1 a 12)
+        intensidade_evento: 0 a 1
         """
 
         if self.modelo is None:
             raise Exception("ERRO: o modelo ainda não foi treinado!")
 
-        X = np.array([ultimos_3_meses])
+        mes_normalizado = mes_atual / 12
+
+        entrada = ultimos_3_meses + [mes_normalizado, intensidade_evento]
+
+        X = np.array([entrada])
         pred = self.modelo.predict(X)[0]
-        return max(pred, 0)  # evitar valores negativos
+
+        return max(pred, 0)
 
