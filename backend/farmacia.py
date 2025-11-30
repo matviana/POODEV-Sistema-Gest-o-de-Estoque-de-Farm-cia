@@ -1,4 +1,4 @@
-from database import conectar_banco
+from backend.database import conectar_banco
 
 class Farmacia:
     def __init__(self, nome, endereco, telefone, cnpj, id_farmacia=None):

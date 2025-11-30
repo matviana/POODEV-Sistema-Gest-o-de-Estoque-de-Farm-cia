@@ -1,5 +1,5 @@
-from medicamentos import Medicamento
-from database import conectar_banco, registrar_historico, salvar_receita_medicamento
+from backend.medicamentos import Medicamento
+from backend.database import conectar_banco, registrar_historico , salvar_receita_medicamento
 import os
 
 class Estoque:

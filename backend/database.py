@@ -1,8 +1,8 @@
-
 import os
 import psycopg2
 from psycopg2.extras import DictCursor
 from dotenv import load_dotenv
+import shutil
 
 load_dotenv()
 
@@ -13,7 +13,6 @@ DB_USER = os.getenv("PG_USER", "postgres")
 DB_PASS = os.getenv("PG_PASS", "matale123")
 
 def conectar_banco():
-    """Retorna uma conexão psycopg2. Chame close() depois."""
     return psycopg2.connect(
         host=DB_HOST,
         port=DB_PORT,
@@ -22,12 +21,10 @@ def conectar_banco():
         password=DB_PASS
     )
 
-def criar_tabelas():
-    """
-    Cria tabelas essenciais: medicamentos, farmacias e historico_movimentacoes.
-    Agora suporta medicamentos controlados e caminhos de receita.
-    """
 
+
+
+def criar_tabelas():
     create_medicamentos = """
     CREATE TABLE IF NOT EXISTS medicamentos (
         id SERIAL PRIMARY KEY,
@@ -37,7 +34,7 @@ def criar_tabelas():
         quantidade_minima INT DEFAULT 0,
         codigo_barras VARCHAR(50) UNIQUE,
         quantidade_estoque INT DEFAULT 0,
-        controlado BOOLEAN DEFAULT FALSE     -- novo campo
+        receita_obrigatoria BOOLEAN DEFAULT FALSE
     );
     """
 
@@ -55,13 +52,18 @@ def criar_tabelas():
     CREATE TABLE IF NOT EXISTS historico_movimentacoes (
         id SERIAL PRIMARY KEY,
         id_medicamento INT NOT NULL REFERENCES medicamentos(id) ON DELETE CASCADE,
-        tipo VARCHAR(20) NOT NULL,             
+        tipo VARCHAR(20) NOT NULL,
         quantidade INT NOT NULL,
+        estoque_antes INT,
+        estoque_depois INT,
         data_movimento TIMESTAMP DEFAULT NOW(),
         observacao TEXT,
-        caminho_receita TEXT                 -- novo campo
+        caminho_receita TEXT
     );
-    """
+"""
+
+
+
 
     conn = None
     try:
@@ -71,7 +73,6 @@ def criar_tabelas():
                 cur.execute(create_medicamentos)
                 cur.execute(create_farmacias)
                 cur.execute(create_historico)
-
         print("Tabelas criadas/verificadas com sucesso.")
     except Exception as e:
         print("Erro ao criar tabelas:", e)
@@ -82,13 +83,7 @@ def criar_tabelas():
         if conn:
             conn.close()
 
-
 def registrar_historico(id_medicamento, tipo, quantidade, observacao=None, caminho_receita=None):
-    """
-    Registra uma entrada ou saída de estoque no histórico.
-    Agora aceita caminho_receita para medicamentos controlados.
-    """
-
     query = """
         INSERT INTO historico_movimentacoes
         (id_medicamento, tipo, quantidade, observacao, caminho_receita)
@@ -115,3 +110,17 @@ def registrar_historico(id_medicamento, tipo, quantidade, observacao=None, camin
     finally:
         if conn:
             conn.close()
+
+def salvar_receita_medicamento(caminho_origem, caminho_destino):
+    try:
+        shutil.copy(caminho_origem, caminho_destino)
+        return True
+    except Exception as e:
+        print("Erro ao salvar arquivo da receita:", e)
+        return False
+    
+    
+def get_db_connection():
+    return conectar_banco()
+
+

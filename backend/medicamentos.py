@@ -1,5 +1,5 @@
 
-from database import conectar_banco
+from backend.database import conectar_banco
 from datetime import date, datetime
 
 class Medicamento:
