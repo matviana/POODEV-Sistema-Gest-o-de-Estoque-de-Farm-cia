@@ -124,3 +124,75 @@ def get_db_connection():
     return conectar_banco()
 
 
+def cadastrar_farmacia(nome, endereco, telefone, cnpj):
+    sql = """
+        INSERT INTO farmacias (nome, endereco, telefone, cnpj)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id;
+    """
+    conn = conectar_banco()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (nome, endereco, telefone, cnpj))
+                return cur.fetchone()[0]
+    except Exception as e:
+        print("Erro ao cadastrar farmácia:", e)
+        if conn:
+            conn.rollback()
+        return None
+    finally:
+        conn.close()
+
+
+def listar_farmacias():
+    sql = "SELECT id, nome, endereco, telefone, cnpj FROM farmacias ORDER BY nome;"
+    conn = conectar_banco()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql)
+            return cur.fetchall()
+    finally:
+        conn.close()
+
+
+def buscar_farmacia_por_id(id_farmacia):
+    sql = "SELECT id, nome, endereco, telefone, cnpj FROM farmacias WHERE id = %s;"
+    conn = conectar_banco()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(sql, (id_farmacia,))
+            return cur.fetchone()
+    finally:
+        conn.close()
+
+
+def atualizar_farmacia(id_farmacia, nome, endereco, telefone):
+    sql = """
+        UPDATE farmacias
+        SET nome = %s, endereco = %s, telefone = %s
+        WHERE id = %s;
+    """
+    conn = conectar_banco()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (nome, endereco, telefone, id_farmacia))
+                return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+def deletar_farmacia(id_farmacia):
+    sql = "DELETE FROM farmacias WHERE id = %s;"
+    conn = conectar_banco()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (id_farmacia,))
+                return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+

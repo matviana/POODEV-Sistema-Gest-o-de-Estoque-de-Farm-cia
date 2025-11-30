@@ -14,6 +14,8 @@ from fastapi import FastAPI
 from backend.routers.medicamentos_router import router as medicamentos_router
 from backend.routers.estoque_router import router as estoque_router
 from backend.routers.historico_router import router as historico_router
+from backend.routers.farmacias_router import router as farmacias_router
+from backend.routers.ia_router import router as ia_router
 
 
 
@@ -23,6 +25,8 @@ app = FastAPI(title="Sistema de Farmácia - API")
 app.include_router(medicamentos_router)
 app.include_router(estoque_router)
 app.include_router(historico_router)
+app.include_router(farmacias_router)
+app.include_router(ia_router)
 
 
 
