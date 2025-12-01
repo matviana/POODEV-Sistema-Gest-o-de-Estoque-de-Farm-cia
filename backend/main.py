@@ -35,9 +35,7 @@ def root():
     return {"mensagem": "API funcionando!"}
 
 
-# -------------------------------
-#  FUNÇÕES DO SISTEMA ANTIGO (MENU)
-# -------------------------------
+
 
 def mostrar_alertas():
     """Exibe alertas de medicamentos vencidos ou próximos do vencimento."""
@@ -84,9 +82,7 @@ def menu():
 
         opcao = input("Escolha uma opção: ")
 
-        # --- Aqui mantém toda a sua lógica original ---
-        # (NÃO removi nada)
-        # ------------------------------------------------
+       
         
         if opcao == "1":
             nome = input("Nome: ")
@@ -256,9 +252,6 @@ def menu():
             print("Opção inválida.")
 
 
-# ======================
-#  EXECUÇÃO VIA TERMINAL
-# ======================
 
 if __name__ == "__main__":
     criar_tabelas()

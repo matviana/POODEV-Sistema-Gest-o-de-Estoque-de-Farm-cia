@@ -10,9 +10,9 @@ from backend.database import (
 router = APIRouter(prefix="/farmacias", tags=["Farmácias"])
 
 
-# ==============================
+
 # CADASTRAR FARMÁCIA
-# ==============================
+
 @router.post("/")
 def cadastrar(nome: str, endereco: str, telefone: str, cnpj: str):
     nova_id = cadastrar_farmacia(nome, endereco, telefone, cnpj)
@@ -23,9 +23,9 @@ def cadastrar(nome: str, endereco: str, telefone: str, cnpj: str):
     return {"status": "ok", "id": nova_id}
 
 
-# ==============================
+
 # LISTAR TODAS
-# ==============================
+
 @router.get("/")
 def listar():
     dados = listar_farmacias()
@@ -44,9 +44,9 @@ def listar():
     return {"total": len(resultados), "farmacias": resultados}
 
 
-# ==============================
+
 # BUSCAR POR ID
-# ==============================
+
 @router.get("/{id_farmacia}")
 def buscar(id_farmacia: int):
     dado = buscar_farmacia_por_id(id_farmacia)
@@ -63,9 +63,9 @@ def buscar(id_farmacia: int):
     }
 
 
-# ==============================
+
 # ATUALIZAR FARMÁCIA
-# ==============================
+
 @router.put("/{id_farmacia}")
 def atualizar(id_farmacia: int, nome: str, endereco: str, telefone: str):
     ok = atualizar_farmacia(id_farmacia, nome, endereco, telefone)
@@ -76,9 +76,9 @@ def atualizar(id_farmacia: int, nome: str, endereco: str, telefone: str):
     return {"status": "ok", "mensagem": "Farmácia atualizada com sucesso."}
 
 
-# ==============================
+
 # DELETAR
-# ==============================
+
 @router.delete("/{id_farmacia}")
 def deletar(id_farmacia: int):
     ok = deletar_farmacia(id_farmacia)

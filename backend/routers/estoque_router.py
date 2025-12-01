@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from backend.database import get_db_connection
-from backend.historico import registrar_movimentacao   # <-- AGORA CERTO
+from backend.historico import registrar_movimentacao   
 
 router = APIRouter(prefix="/estoque", tags=["Estoque"])
 
@@ -13,9 +13,9 @@ class MovimentacaoIn(BaseModel):
     caminho_receita: str | None = None
 
 
-# =========================
-# Entrada de estoque
-# =========================
+
+# Entrada de estoque(+)
+
 @router.post("/entrada")
 def entrada_estoque(payload: MovimentacaoIn):
     conn = get_db_connection()
@@ -38,7 +38,7 @@ def entrada_estoque(payload: MovimentacaoIn):
         )
         conn.commit()
 
-        # <<< REGISTRO DE HISTÓRICO CORRETO >>>
+        #  REGISTRO DE HISTÓRICO 
         registrar_movimentacao(
             id_medicamento=id_med,
             tipo="entrada",
@@ -59,9 +59,9 @@ def entrada_estoque(payload: MovimentacaoIn):
         conn.close()
 
 
-# =========================
-# Saída de estoque
-# =========================
+
+# saída de estoque
+
 @router.post("/saida")
 def saida_estoque(payload: MovimentacaoIn):
     conn = get_db_connection()
@@ -91,7 +91,7 @@ def saida_estoque(payload: MovimentacaoIn):
         )
         conn.commit()
 
-        # <<< REGISTRO DE HISTÓRICO CORRETO >>>
+        #  registro de historico 
         registrar_movimentacao(
             id_medicamento=id_med,
             tipo="saida",
@@ -112,9 +112,9 @@ def saida_estoque(payload: MovimentacaoIn):
         conn.close()
 
 
-# =========================
+
 # Alertas
-# =========================
+
 @router.get("/alertas")
 def alertas_reposicao():
     conn = get_db_connection()
@@ -140,9 +140,9 @@ def alertas_reposicao():
         conn.close()
 
 
-# =========================
+
 # Estoque baixo
-# =========================
+
 @router.get("/baixo")
 def verificar_estoque_baixo(
     threshold: int | None = Query(None),
@@ -182,9 +182,9 @@ def verificar_estoque_baixo(
         conn.close()
 
 
-# =========================
+
 # Reposição automática
-# =========================
+
 @router.post("/repor_automatico")
 def repor_automatico():
     conn = get_db_connection()

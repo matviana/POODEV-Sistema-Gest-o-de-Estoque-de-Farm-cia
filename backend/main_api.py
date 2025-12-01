@@ -11,21 +11,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# ================================
-# CONFIGURAÇÃO DE CORS
-# ================================
-# Permite o frontend React acessar esta API
+
+# config de cors
+
+#permite frontend React acessar essa API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # depois podemos restringir
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ================================
+
 # ROTAS DA API
-# ================================
+
 @app.get("/")
 def raiz():
     return {"status": "online", "mensagem": "API da Farmácia funcionando!"}
