@@ -8,50 +8,49 @@ def registrar_movimentacao(
     id_medicamento: int,
     tipo: str,
     quantidade: int,
+    estoque_antes: Optional[int] = None,
+    estoque_depois: Optional[int] = None,
     observacao: Optional[str] = None,
     caminho_receita: Optional[str] = None
 ) -> bool:
     """
-    Compatível com a função registrar_historico (database.py).
-    Registra id_medicamento, tipo, quantidade, observacao e caminho_receita.
+    Registra uma movimentação no histórico, agora com suporte a estoque antes/depois.
     """
     sql = """
         INSERT INTO historico_movimentacoes
-        (id_medicamento, tipo, quantidade, observacao, caminho_receita)
-        VALUES (%s, %s, %s, %s, %s)
+        (id_medicamento, tipo, quantidade, estoque_antes, estoque_depois, observacao, caminho_receita)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         RETURNING id;
     """
 
-    conn = None
+    conn = conectar_banco()
     try:
-        conn = conectar_banco()
-        with conn:
-            with conn.cursor() as cur:
-                cur.execute(sql, (
-                    id_medicamento,
-                    tipo,
-                    quantidade,
-                    observacao,
-                    caminho_receita
-                ))
-                cur.fetchone()
+        with conn.cursor() as cur:
+            cur.execute(sql, (
+                id_medicamento,
+                tipo,
+                quantidade,
+                estoque_antes,
+                estoque_depois,
+                observacao,
+                caminho_receita
+            ))
+            cur.fetchone()
+        conn.commit()  # garante que o registro seja salvo
         return True
 
     except Exception as e:
         print("ERRO registrar_movimentacao:", e)
-        if conn:
-            conn.rollback()
+        conn.rollback()
         return False
 
     finally:
-        if conn:
-            conn.close()
+        conn.close()
 
 
 def consultar_todas(limit: int = 200) -> List[Tuple]:
     """
-    Retorna todas as movimentações do histórico, juntando nome e código de barras.
-    Compatível com o esquema criado por database.criar_tabelas().
+    Retorna todas as movimentações do histórico, incluindo nome e código de barras do medicamento.
     """
     sql = """
         SELECT
@@ -60,8 +59,8 @@ def consultar_todas(limit: int = 200) -> List[Tuple]:
             m.nome,
             h.tipo,
             h.quantidade,
-            NULL AS estoque_antes,
-            NULL AS estoque_depois,
+            h.estoque_antes,
+            h.estoque_depois,
             h.data_movimento,
             h.observacao
         FROM historico_movimentacoes h
@@ -90,8 +89,8 @@ def consultar_por_medicamento(codigo_barras: str, limit: int = 100) -> List[Tupl
             m.nome,
             h.tipo,
             h.quantidade,
-            NULL AS estoque_antes,
-            NULL AS estoque_depois,
+            h.estoque_antes,
+            h.estoque_depois,
             h.data_movimento,
             h.observacao
         FROM historico_movimentacoes h
@@ -121,8 +120,8 @@ def consultar_por_tipo(tipo: str, limit: int = 100) -> List[Tuple]:
             m.nome,
             h.tipo,
             h.quantidade,
-            NULL AS estoque_antes,
-            NULL AS estoque_depois,
+            h.estoque_antes,
+            h.estoque_depois,
             h.data_movimento,
             h.observacao
         FROM historico_movimentacoes h
@@ -158,7 +157,7 @@ def consultar_mais_vendidos_mes(mes=None, ano=None):
         JOIN medicamentos m ON m.id = h.id_medicamento
         WHERE h.tipo = 'saida'
           AND EXTRACT(MONTH FROM h.data_movimento) = %s
-          AND EXTRACT(YEAR  FROM h.data_movimento) = %s
+          AND EXTRACT(YEAR FROM h.data_movimento) = %s
         GROUP BY m.nome
         ORDER BY total_vendido DESC;
     """
