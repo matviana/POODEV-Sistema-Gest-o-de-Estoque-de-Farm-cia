@@ -5,35 +5,101 @@ from backend.redeneural import RedeNeuralDemanda
 
 router = APIRouter(prefix="/ia", tags=["Inteligência Artificial"])
 
+
+# ---------------- MODELOS ---------------- #
+
+class TreinamentoIn(BaseModel):
+    vendas_mensais: List[float]   # 12 valores
+    eventos_mensais: List[float]  # 12 valores entre 0 e 1
+
+
 class PrevisaoDemandaIn(BaseModel):
-    ultimos_3_meses: List[float]  # validação manual depois
-    mes_atual: int  # 1 a 12
-    intensidade_evento: float  # 0 a 1
+    ultimos_3_meses: List[float]  # 3 valores
+    mes_atual: int
+    intensidade_evento: float
 
-@router.post("/prever_demanda")
-def prever_demanda(payload: PrevisaoDemandaIn):
-    """
-    Previsão de demanda futura considerando:
-    - últimos 3 meses de vendas
-    - mês atual (sazonalidade)
-    - intensidade de evento epidemiológico
-    """
 
-    # Validações manuais
-    if len(payload.ultimos_3_meses) != 3:
-        raise HTTPException(status_code=400, detail="ultimos_3_meses deve conter exatamente 3 valores")
-    if payload.mes_atual < 1 or payload.mes_atual > 12:
-        raise HTTPException(status_code=400, detail="mes_atual deve estar entre 1 e 12")
-    if payload.intensidade_evento < 0 or payload.intensidade_evento > 1:
-        raise HTTPException(status_code=400, detail="intensidade_evento deve estar entre 0 e 1")
+class TreinarMedicamentoIn(BaseModel):
+    nome_medicamento: str
+    vendas_mensais: List[float]     # 12 valores
+    eventos_mensais: List[float]    # 12 valores entre 0 e 1
+
+
+class PreverMedicamentoIn(BaseModel):
+    nome_medicamento: str
+    ultimos_3_meses: List[float]
+    mes_atual: int
+    intensidade_evento: float
+
+
+# ---------------- ROTAS GERAIS ---------------- #
+
+@router.post("/treinar")
+def treinar_modelo(payload: TreinamentoIn):
+    if len(payload.vendas_mensais) != 12:
+        raise HTTPException(status_code=400, detail="vendas_mensais deve conter 12 valores")
+
+    if len(payload.eventos_mensais) != 12:
+        raise HTTPException(status_code=400, detail="eventos_mensais deve conter 12 valores")
 
     try:
         ia = RedeNeuralDemanda()
+        ia.treinar_com_eventos(payload.vendas_mensais, payload.eventos_mensais)
+        return {"status": "Modelo geral treinado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/prever_demanda")
+def prever_demanda(payload: PrevisaoDemandaIn):
+    try:
+        ia = RedeNeuralDemanda()
         previsao = ia.prever_proximo_mes_eventos(
-            ultimos_3_meses=payload.ultimos_3_meses,
-            mes_atual=payload.mes_atual,
-            intensidade_evento=payload.intensidade_evento
+            payload.ultimos_3_meses,
+            payload.mes_atual,
+            payload.intensidade_evento
         )
         return {"previsao_demanda": round(previsao, 2)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ---------------- ROTAS POR MEDICAMENTO ---------------- #
+
+@router.post("/treinar_medicamento")
+def treinar_medicamento(payload: TreinarMedicamentoIn):
+    if len(payload.vendas_mensais) != 12:
+        raise HTTPException(status_code=400, detail="vendas_mensais deve conter 12 valores")
+
+    if len(payload.eventos_mensais) != 12:
+        raise HTTPException(status_code=400, detail="eventos_mensais deve conter 12 valores")
+
+    try:
+        RedeNeuralDemanda.treinar_medicamento(
+            payload.nome_medicamento,
+            payload.vendas_mensais,
+            payload.eventos_mensais
+        )
+        return {"status": f"Modelo do medicamento '{payload.nome_medicamento}' treinado com sucesso"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/prever_medicamento")
+def prever_medicamento(payload: PreverMedicamentoIn):
+    if len(payload.ultimos_3_meses) != 3:
+        raise HTTPException(status_code=400, detail="ultimos_3_meses precisa de 3 valores")
+
+    try:
+        previsao = RedeNeuralDemanda.prever_medicamento(
+            payload.nome_medicamento,
+            payload.ultimos_3_meses,
+            payload.mes_atual,
+            payload.intensidade_evento
+        )
+        return {
+            "medicamento": payload.nome_medicamento,
+            "previsao_demanda": round(previsao, 2)
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
