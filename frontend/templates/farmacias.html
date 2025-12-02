@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Farmácias</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <h1>Gerenciamento de Farmácias</h1>
+
+    <!-- CADASTRAR -->
+    <section>
+        <h2>Cadastrar Farmácia</h2>
+        <input id="nome" placeholder="Nome" />
+        <input id="endereco" placeholder="Endereço" />
+        <input id="telefone" placeholder="Telefone" />
+        <input id="cnpj" placeholder="CNPJ" />
+        <button onclick="cadastrarFarmacia()">Cadastrar</button>
+        <pre id="resultadoCadastro"></pre>
+    </section>
+
+    <!-- LISTAR TODAS -->
+    <section>
+        <h2>Listar Todas as Farmácias</h2>
+        <button onclick="listarFarmacias()">Listar</button>
+        <pre id="resultadoLista"></pre>
+    </section>
+
+    <!-- BUSCAR POR ID -->
+    <section>
+        <h2>Buscar Farmácia por ID</h2>
+        <input id="buscarId" placeholder="ID" type="number" />
+        <button onclick="buscarFarmacia()">Buscar</button>
+        <pre id="resultadoBusca"></pre>
+    </section>
+
+    <!-- DELETAR -->
+    <section>
+        <h2>Deletar Farmácia</h2>
+        <input id="deleteId" placeholder="ID" type="number" />
+        <button onclick="deletarFarmacia()">Deletar</button>
+        <pre id="resultadoDelete"></pre>
+    </section>
+
+    <script src="/static/js/farmacias.js"></script>
+</body>
+</html>

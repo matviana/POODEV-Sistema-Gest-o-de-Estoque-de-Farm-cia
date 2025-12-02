@@ -26,20 +26,25 @@ from backend.routers.ia_router import router as ia_router
 
 app = FastAPI(title="Sistema de Farmácia - API")
 
-
+# Servir arquivos estáticos
 app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
-
+# Configurar templates
 templates = Jinja2Templates(directory="frontend/templates")
 
+# ROTAS DO FRONT-END (HTML) 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/medicamentos", response_class=HTMLResponse)
+@app.get("/frontend/medicamentos")
 def pagina_medicamentos(request: Request):
     return templates.TemplateResponse("medicamentos.html", {"request": request})
+
+@app.get("/frontend/farmacias", response_class=HTMLResponse)
+def frontend_farmacias(request: Request):
+    return templates.TemplateResponse("farmacias.html", {"request": request})
 
 
 app.include_router(medicamentos_router)

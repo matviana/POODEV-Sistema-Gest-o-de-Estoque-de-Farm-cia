@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from backend.database import (
     cadastrar_farmacia,
     listar_farmacias,
@@ -10,12 +11,20 @@ from backend.database import (
 router = APIRouter(prefix="/farmacias", tags=["Farmácias"])
 
 
-
-# CADASTRAR FARMÁCIA
+class FarmaciaCreate(BaseModel):
+    nome: str
+    endereco: str
+    telefone: str
+    cnpj: str
 
 @router.post("/")
-def cadastrar(nome: str, endereco: str, telefone: str, cnpj: str):
-    nova_id = cadastrar_farmacia(nome, endereco, telefone, cnpj)
+def cadastrar(farmacia: FarmaciaCreate):
+    nova_id = cadastrar_farmacia(
+        farmacia.nome,
+        farmacia.endereco,
+        farmacia.telefone,
+        farmacia.cnpj
+    )
 
     if nova_id is None:
         raise HTTPException(status_code=400, detail="Erro ao cadastrar farmácia.")

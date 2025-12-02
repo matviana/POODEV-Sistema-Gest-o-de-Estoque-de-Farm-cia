@@ -84,48 +84,12 @@ def alertas_vencimento(dias_aviso: int = Query(30, description="Número de dias 
 
 
 
-@router.get("/{id}", response_model=MedicamentoResponse)
-def buscar_medicamento(id: int):
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras,
-               quantidade_estoque, receita_obrigatoria
-        FROM medicamentos WHERE id = %s;
-    """, (id,))
-
-    row = cur.fetchone()
-    conn.close()
-
-    if not row:
-        raise HTTPException(status_code=404, detail="Medicamento não encontrado")
-
-    return {
-        "id": row[0],
-        "nome": row[1],
-        "lote": row[2],
-        "validade": row[3],
-        "quantidade_minima": row[4],
-        "codigo_barras": row[5],
-        "quantidade_estoque": row[6],
-        "receita_obrigatoria": row[7],
-    }
-    
-    
-    
 #   BUSCAR MEDICAMENTO POR NOME
-
-@router.get("/buscar/", response_model=list[MedicamentoResponse])
+@router.get("/buscar", response_model=list[MedicamentoResponse])
 def buscar_medicamento_por_nome(nome: str):
-    """
-    Busca medicamentos cujo nome contém o texto informado (case-insensitive).
-    Retorna lista de correspondências.
-    """
     conn = get_db_connection()
     cur = conn.cursor()
 
-    
     cur.execute("""
         SELECT id, nome, lote, validade, quantidade_minima, codigo_barras,
                quantidade_estoque, receita_obrigatoria
@@ -154,6 +118,18 @@ def buscar_medicamento_por_nome(nome: str):
 
     return medicamentos
 
+
+#   BUSCA POR ID
+@router.get("/{id}", response_model=MedicamentoResponse)
+def buscar_medicamento(id: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT id, nome, lote, validade, quantidade_minima, codigo_barras,
+               quantidade_estoque, receita_obrigatoria
+        FROM medicamentos WHERE id = %s;
+    """, (id,))
 
 
 
