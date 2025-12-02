@@ -5,80 +5,84 @@
     <title>Gerenciar Estoque</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
 
     <h1>Gerenciar Estoque</h1>
 
+    <!-- TABS -->
     <div class="tabs">
-        <button onclick="mostrarAba('entrada')">Entrada</button>
-        <button onclick="mostrarAba('saida')">Saida</button>
-        <button onclick="mostrarAba('alertas')">Alertas de Reposição</button>
-        <button onclick="mostrarAba('baixo')">Estoque Baixo</button>
-        <button onclick="mostrarAba('repor')">Reposição Automática</button>
+        <button class="tab-btn" onclick="mostrarAba('entrada')">➕ Entrada</button>
+        <button class="tab-btn" onclick="mostrarAba('saida')">➖ Saída</button>
+        <button class="tab-btn" onclick="mostrarAba('alertas')">⚠ Alertas</button>
+        <button class="tab-btn" onclick="mostrarAba('baixo')">📉 Baixo Estoque</button>
+        <button class="tab-btn" onclick="mostrarAba('repor')">🔁 Reposição Automática</button>
     </div>
 
-    <div id="entrada" class="aba">
+    <!-- ABA: ENTRADA -->
+    <div id="entrada" class="aba card">
         <h2>Entrada de Estoque</h2>
+
         <label>Código de Barras:</label>
-        <input type="text" id="entrada_codigo"><br>
+        <input type="text" id="entrada_codigo" class="input">
 
         <label>Quantidade:</label>
-        <input type="number" id="entrada_quantidade"><br>
+        <input type="number" id="entrada_quantidade" class="input">
 
         <label>Observação:</label>
-        <input type="text" id="entrada_obs"><br>
+        <input type="text" id="entrada_obs" class="input">
 
-        <button onclick="entradaEstoque()">Registrar Entrada</button>
-
-        <pre id="resultado_entrada"></pre>
+        <button class="btn" onclick="entradaEstoque()">Registrar Entrada</button>
+        <pre id="resultado_entrada" class="resultado"></pre>
     </div>
 
-
-    <div id="saida" class="aba" style="display:none;">
+    <!-- ABA: SAÍDA -->
+    <div id="saida" class="aba card" style="display:none;">
         <h2>Saída de Estoque</h2>
+
         <label>Código de Barras:</label>
-        <input type="text" id="saida_codigo"><br>
+        <input type="text" id="saida_codigo" class="input">
 
         <label>Quantidade:</label>
-        <input type="number" id="saida_quantidade"><br>
+        <input type="number" id="saida_quantidade" class="input">
 
         <label>Observação:</label>
-        <input type="text" id="saida_obs"><br>
+        <input type="text" id="saida_obs" class="input">
 
         <label>Caminho da Receita (se necessário):</label>
-        <input type="text" id="saida_receita"><br>
+        <input type="text" id="saida_receita" class="input">
 
-        <button onclick="saidaEstoque()">Registrar Saída</button>
-
-        <pre id="resultado_saida"></pre>
+        <button class="btn" onclick="saidaEstoque()">Registrar Saída</button>
+        <pre id="resultado_saida" class="resultado"></pre>
     </div>
 
-
-    <div id="alertas" class="aba" style="display:none;">
+    <!-- ABA: ALERTAS -->
+    <div id="alertas" class="aba card" style="display:none;">
         <h2>Alertas de Reposição</h2>
-        <button onclick="buscarAlertas()">Buscar Alertas</button>
-        <pre id="resultado_alertas"></pre>
+        <button class="btn" onclick="buscarAlertas()">Buscar Alertas</button>
+        <pre id="resultado_alertas" class="resultado"></pre>
     </div>
 
-    <div id="baixo" class="aba" style="display:none;">
+    <!-- ABA: ESTOQUE BAIXO -->
+    <div id="baixo" class="aba card" style="display:none;">
         <h2>Estoque Baixo</h2>
 
-        <label>Threshold (opcional): </label>
-        <input type="number" id="baixo_threshold">
-        <br>
+        <label>Threshold (opcional):</label>
+        <input type="number" id="baixo_threshold" class="input">
 
-        <label>Porcentagem (opcional): </label>
-        <input type="number" id="baixo_pct">
-        <br>
+        <label>Porcentagem (opcional):</label>
+        <input type="number" id="baixo_pct" class="input">
 
-        <button onclick="buscarEstoqueBaixo()">Consultar Estoque Baixo</button>
-        <pre id="resultado_baixo"></pre>
+        <button class="btn" onclick="buscarEstoqueBaixo()">Consultar Estoque Baixo</button>
+        <pre id="resultado_baixo" class="resultado"></pre>
     </div>
 
-    <div id="repor" class="aba" style="display:none;">
+    <!-- ABA: REPOSIÇÃO AUTO -->
+    <div id="repor" class="aba card" style="display:none;">
         <h2>Reposição Automática</h2>
-        <button onclick="reporAutomatico()">Executar Reposição</button>
-        <pre id="resultado_repor"></pre>
+
+        <button class="btn" onclick="reporAutomatico()">Executar Reposição</button>
+        <pre id="resultado_repor" class="resultado"></pre>
     </div>
 
     <script src="/static/js/estoque.js"></script>

@@ -3,87 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <title>Histórico de Movimentações</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Seu CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <h1>Histórico de Movimentações</h1>
 
-    <a href="/">⬅ Voltar ao início</a>
+<body class="bg-light">
 
-    <hr>
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">💊 Sistema de Estoque</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <h2 class="mb-4">📜 Histórico de Movimentações</h2>
 
     <!-- Abas -->
-    <button onclick="abrirAba('aba_movimentacoes')">Movimentações</button>
-    <button onclick="abrirAba('aba_vendidos')">Mais Vendidos</button>
+    <ul class="nav nav-tabs" id="tabsHistorico">
+        <li class="nav-item">
+            <button class="nav-link active" onclick="abrirAba('aba_movimentacoes')">Movimentações</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" onclick="abrirAba('aba_vendidos')">Mais Vendidos</button>
+        </li>
+    </ul>
 
-    <hr>
+    <!-- Conteúdo das Abas -->
+    <div class="card p-4 mt-3">
 
-    <!-- ABA 1: Movimentações -->
-    <div id="aba_movimentacoes" class="aba">
+        <!-- ABA 1 -->
+        <div id="aba_movimentacoes">
+            <h4>🔍 Consultar Movimentações</h4>
 
-        <h2>Consultar Movimentações</h2>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label class="form-label">Tipo</label>
+                    <select id="tipo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                        <option value="repor">Reposição</option>
+                    </select>
+                </div>
 
-        <label>Tipo:</label>
-        <select id="tipo">
-            <option value="">Todos</option>
-            <option value="entrada">Entrada</option>
-            <option value="saida">Saída</option>
-            <option value="repor">Reposição</option>
-        </select>
+                <div class="col-md-4">
+                    <label class="form-label">Código de Barras</label>
+                    <input type="text" id="codigo_barras" class="form-control">
+                </div>
 
-        <label>Código de barras:</label>
-        <input type="text" id="codigo_barras">
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" onclick="consultarMovimentacoes()">
+                        Buscar
+                    </button>
+                </div>
+            </div>
 
-        <button onclick="consultarMovimentacoes()">Consultar</button>
+            <hr>
 
-        <hr>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-center align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Quantidade</th>
+                            <th>Antes</th>
+                            <th>Depois</th>
+                            <th>Data/Hora</th>
+                            <th>Obs</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela_movimentacoes"></tbody>
+                </table>
+            </div>
+        </div>
 
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Código</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Quantidade</th>
-                    <th>Antes</th>
-                    <th>Depois</th>
-                    <th>Data/Hora</th>
-                    <th>Obs</th>
-                </tr>
-            </thead>
-            <tbody id="tabela_movimentacoes"></tbody>
-        </table>
+        <!-- ABA 2 -->
+        <div id="aba_vendidos" style="display:none;">
+            <h4>🏆 Medicamentos mais vendidos</h4>
+
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label class="form-label">Mês</label>
+                    <input type="number" id="mes" class="form-control" min="1" max="12">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Ano</label>
+                    <input type="number" id="ano" class="form-control" min="2000" max="2100">
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-success w-100" onclick="consultarMaisVendidos()">
+                        Consultar
+                    </button>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered text-center align-middle">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Total Vendido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela_vendidos"></tbody>
+                </table>
+            </div>
+
+        </div>
 
     </div>
 
-    <!-- ABA 2: Mais Vendidos -->
-    <div id="aba_vendidos" class="aba" style="display:none;">
+</div>
 
-        <h2>Medicamentos mais vendidos</h2>
-
-        <label>Mês:</label>
-        <input type="number" id="mes" min="1" max="12">
-
-        <label>Ano:</label>
-        <input type="number" id="ano" min="2000" max="2100">
-
-        <button onclick="consultarMaisVendidos()">Consultar</button>
-
-        <hr>
-
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Total vendido</th>
-                </tr>
-            </thead>
-            <tbody id="tabela_vendidos"></tbody>
-        </table>
-
-    </div>
-
-    <script src="/static/js/historico.js"></script>
+<script src="/static/js/historico.js"></script>
 </body>
 </html>

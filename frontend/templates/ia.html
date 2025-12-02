@@ -11,62 +11,71 @@
 
 <div class="container">
 
-    <h2>Treinar modelo geral</h2>
+    <!-- TREINAR MODELO GERAL -->
+    <h2>Treinar Modelo Geral</h2>
+
     <label>Vendas mensais (12 valores separados por vírgula):</label>
-    <input id="vendas_geral" type="text" placeholder="10,20,30...">
+    <input id="vendas_geral" type="text" placeholder="10,20,30,40...">
 
     <label>Eventos mensais (12 valores entre 0 e 1):</label>
-    <input id="eventos_geral" type="text" placeholder="0,1,0,2...">
+    <input id="eventos_geral" type="text" placeholder="0,1,0,0.5...">
 
     <button onclick="treinarGeral()">Treinar Modelo Geral</button>
 
     <hr>
 
-    <h2>Prever demanda geral (próximo mês)</h2>
-    <label>Últimos 3 meses (3 valores separados por vírgula):</label>
-    <input id="ultimos3_geral" type="text">
+    <!-- PREVISÃO GERAL -->
+    <h2>Prever Demanda Geral (Próximo mês)</h2>
 
-    <label>Mês atual (1-12):</label>
-    <input id="mes_atual_geral" type="number">
+    <label>Últimos 3 meses (3 valores separados por vírgula):</label>
+    <input id="ultimos3_geral" type="text" placeholder="120,130,140">
+
+    <label>Mês atual (1–12):</label>
+    <input id="mes_atual_geral" type="number" min="1" max="12">
 
     <label>Intensidade do evento (0 a 1):</label>
-    <input id="evento_geral" type="number" step="0.1">
+    <input id="evento_geral" type="number" step="0.1" min="0" max="1">
 
     <button onclick="preverGeral()">Prever Demanda Geral</button>
 
     <hr>
 
-    <h2>Treinar modelo por medicamento</h2>
+    <!-- TREINAR POR MEDICAMENTO -->
+    <h2>Treinar Modelo por Medicamento</h2>
+
     <label>Nome do medicamento:</label>
-    <input id="nome_med_treinar" type="text">
+    <input id="nome_med_treinar" type="text" placeholder="Ex: Dipirona">
 
     <label>Vendas mensais (12 valores):</label>
-    <input id="vendas_med" type="text">
+    <input id="vendas_med" type="text" placeholder="10,20,30...">
 
     <label>Eventos mensais (12 valores):</label>
-    <input id="eventos_med" type="text">
+    <input id="eventos_med" type="text" placeholder="0,1,0...">
 
     <button onclick="treinarMedicamento()">Treinar Medicamento</button>
 
     <hr>
 
-    <h2>Prever demanda por medicamento</h2>
+    <!-- PREVER POR MEDICAMENTO -->
+    <h2>Prever Demanda por Medicamento</h2>
+
     <label>Nome do medicamento:</label>
-    <input id="nome_med_prever" type="text">
+    <input id="nome_med_prever" type="text" placeholder="Ex: Ibuprofeno">
 
     <label>Últimos 3 meses:</label>
-    <input id="ultimos3_med" type="text">
+    <input id="ultimos3_med" type="text" placeholder="120,130,140">
 
-    <label>Mês atual:</label>
-    <input id="mes_atual_med" type="number">
+    <label>Mês atual (1–12):</label>
+    <input id="mes_atual_med" type="number" min="1" max="12">
 
-    <label>Intensidade do evento:</label>
-    <input id="evento_med" type="number" step="0.1">
+    <label>Intensidade do evento (0–1):</label>
+    <input id="evento_med" type="number" step="0.1" min="0" max="1">
 
     <button onclick="preverMedicamento()">Prever Medicamento</button>
 
     <hr>
 
+    <!-- RESULTADO -->
     <h2>Resultado</h2>
     <pre id="resultado"></pre>
 

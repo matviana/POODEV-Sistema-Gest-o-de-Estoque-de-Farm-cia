@@ -1,0 +1,135 @@
+/* ---------- RESET ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- BODY ---------- */
+body {
+    background: #f4f6f9;
+    padding: 20px;
+}
+
+/* ---------- CONTAINER PRINCIPAL ---------- */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* ---------- TITULOS ---------- */
+h1, h2, h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 28px;
+    text-align: center;
+}
+
+/* ---------- BOTÕES ---------- */
+button {
+    background: #0077ff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #005fcc;
+}
+
+/* Botão vermelho */
+.btn-danger {
+    background: #e63946;
+}
+
+.btn-danger:hover {
+    background: #c72d39;
+}
+
+/* ---------- INPUTS ---------- */
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 12px;
+    outline: none;
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #0077ff;
+}
+
+/* ---------- FORMULÁRIO ---------- */
+.form-box {
+    background: #f9fafc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e3e6ea;
+}
+
+/* ---------- TABELA ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+thead {
+    background: #0077ff;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+    background: #eef5ff;
+}
+
+/* ---------- NAV ---------- */
+.navbar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.navbar a {
+    background: #0077ff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.navbar a:hover {
+    background: #005fcc;
+}
+
+/* ---------- CARDS (se você quiser usar) ---------- */
+.card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e5e8ec;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+    margin-bottom: 15px;
+}

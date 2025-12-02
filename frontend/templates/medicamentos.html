@@ -1,59 +1,130 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicamentos</title>
-    <link rel="stylesheet" href="/css/style.css" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- CSS personalizado -->
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
-    <h1>Gerenciamento de Medicamentos</h1>
 
-   <section>
-    <h2>Cadastrar Medicamento</h2>
+<body class="bg-light">
 
-    <input id="nome" placeholder="Nome" />
-    <input id="lote" placeholder="Lote" />
-    <input id="validade" type="date" placeholder="Validade" />
-    <input id="quantidade_minima" type="number" placeholder="Quantidade mínima" />
-    <input id="codigo_barras" placeholder="Código de barras" />
-    <input id="quantidade_estoque" type="number" placeholder="Quantidade em estoque" />
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a href="/" class="navbar-brand">⬅ Voltar</a>
+        <span class="navbar-brand">💊 Medicamentos</span>
+    </div>
+</nav>
 
-    <label>
-        Receita obrigatória?
-        <input id="receita_obrigatoria" type="checkbox" />
-    </label>
+<div class="container my-4">
 
-    <button onclick="cadastrarMedicamento()">Cadastrar</button>
+    <!-- CARD CADASTRO -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white fw-bold">
+            Cadastrar Medicamento
+        </div>
 
-    <pre id="resultadoCadastro"></pre>
-</section>
+        <div class="card-body">
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Nome</label>
+                    <input id="nome" class="form-control" placeholder="Ex: Dipirona">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Lote</label>
+                    <input id="lote" class="form-control" placeholder="AB123">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Validade</label>
+                    <input id="validade" type="date" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade mínima</label>
+                    <input id="quantidade_minima" type="number" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Código de barras</label>
+                    <input id="codigo_barras" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade em estoque</label>
+                    <input id="quantidade_estoque" type="number" class="form-control">
+                </div>
+
+                <div class="col-md-12 mt-2">
+                    <label class="form-check-label">
+                        <input id="receita_obrigatoria" type="checkbox" class="form-check-input">
+                        Receita obrigatória?
+                    </label>
+                </div>
+
+                <div class="col-12">
+                    <button class="btn btn-success w-100" onclick="cadastrarMedicamento()">Cadastrar</button>
+                </div>
+
+                <pre id="resultadoCadastro" class="bg-light p-3 rounded"></pre>
+            </div>
+        </div>
+    </div>
 
 
-    <!-- CONSULTAR TODOS -->
-    <section>
-        <h2>Consultar Todos Medicamentos</h2>
-        <button onclick="listarTodos()">Listar</button>
-        <pre id="resultadoTodos"></pre>
-    </section>
+    <!-- CARD CONSULTAR TODOS -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white fw-bold">
+            Consultar Todos os Medicamentos
+        </div>
 
-    <!-- CONSULTAR POR NOME -->
-    <section>
-        <h2>Consultar por Nome</h2>
-        <input id="buscarNome" placeholder="Nome" />
-        <button onclick="buscarPorNome()">Buscar</button>
-        <pre id="resultadoNome"></pre>
-    </section>
+        <div class="card-body">
+            <button class="btn btn-primary mb-3" onclick="listarTodos()">Listar</button>
+            <pre id="resultadoTodos" class="bg-light p-3 rounded"></pre>
+        </div>
+    </div>
 
-    <!-- DELETAR -->
-    <section>
-        <h2>Deletar Medicamento</h2>
-        <input id="deleteId" placeholder="ID do medicamento" type="number" />
-        <button onclick="deletarMedicamento()">Deletar</button>
-        <pre id="resultadoDelete"></pre>
-    </section>
 
-    
-    <script src="/static/js/medicamentos.js"></script>
+    <!-- CARD CONSULTAR POR NOME -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white fw-bold">
+            Consultar por Nome
+        </div>
+
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <input id="buscarNome" class="form-control" placeholder="Ex: Ibuprofeno">
+                <button class="btn btn-info text-white" onclick="buscarPorNome()">Buscar</button>
+            </div>
+            <pre id="resultadoNome" class="bg-light p-3 rounded"></pre>
+        </div>
+    </div>
+
+    <!-- CARD DELETAR -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-danger text-white fw-bold">
+            Deletar Medicamento
+        </div>
+
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <input id="deleteId" type="number" class="form-control" placeholder="ID do medicamento">
+                <button class="btn btn-danger" onclick="deletarMedicamento()">Deletar</button>
+            </div>
+            <pre id="resultadoDelete" class="bg-light p-3 rounded"></pre>
+        </div>
+    </div>
+
+</div>
+
+<script src="/static/js/medicamentos.js"></script>
 </body>
 </html>
