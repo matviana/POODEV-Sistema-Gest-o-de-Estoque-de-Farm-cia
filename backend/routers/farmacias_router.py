@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from backend.schemas.farmacias_schema import FarmaciaCreate
 from backend.database import (
     cadastrar_farmacia,
     listar_farmacias,

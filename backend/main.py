@@ -46,6 +46,17 @@ def pagina_medicamentos(request: Request):
 def frontend_farmacias(request: Request):
     return templates.TemplateResponse("farmacias.html", {"request": request})
 
+@app.get("/frontend/estoque", response_class=HTMLResponse)
+def pagina_estoque(request: Request):
+    return templates.TemplateResponse("estoque.html", {"request": request})
+
+@app.get("/frontend/historico", response_class=HTMLResponse)
+def pagina_historico(request: Request):
+    return templates.TemplateResponse("historico.html", {"request": request})
+
+
+
+
 
 app.include_router(medicamentos_router)
 app.include_router(estoque_router)

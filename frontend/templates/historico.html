@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Movimentações</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Histórico de Movimentações</h1>
+
+    <a href="/">⬅ Voltar ao início</a>
+
+    <hr>
+
+    <!-- Abas -->
+    <button onclick="abrirAba('aba_movimentacoes')">Movimentações</button>
+    <button onclick="abrirAba('aba_vendidos')">Mais Vendidos</button>
+
+    <hr>
+
+    <!-- ABA 1: Movimentações -->
+    <div id="aba_movimentacoes" class="aba">
+
+        <h2>Consultar Movimentações</h2>
+
+        <label>Tipo:</label>
+        <select id="tipo">
+            <option value="">Todos</option>
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+            <option value="repor">Reposição</option>
+        </select>
+
+        <label>Código de barras:</label>
+        <input type="text" id="codigo_barras">
+
+        <button onclick="consultarMovimentacoes()">Consultar</button>
+
+        <hr>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Quantidade</th>
+                    <th>Antes</th>
+                    <th>Depois</th>
+                    <th>Data/Hora</th>
+                    <th>Obs</th>
+                </tr>
+            </thead>
+            <tbody id="tabela_movimentacoes"></tbody>
+        </table>
+
+    </div>
+
+    <!-- ABA 2: Mais Vendidos -->
+    <div id="aba_vendidos" class="aba" style="display:none;">
+
+        <h2>Medicamentos mais vendidos</h2>
+
+        <label>Mês:</label>
+        <input type="number" id="mes" min="1" max="12">
+
+        <label>Ano:</label>
+        <input type="number" id="ano" min="2000" max="2100">
+
+        <button onclick="consultarMaisVendidos()">Consultar</button>
+
+        <hr>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Total vendido</th>
+                </tr>
+            </thead>
+            <tbody id="tabela_vendidos"></tbody>
+        </table>
+
+    </div>
+
+    <script src="/static/js/historico.js"></script>
+</body>
+</html>

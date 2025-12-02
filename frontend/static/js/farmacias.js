@@ -1,14 +1,14 @@
 const API = "http://127.0.0.1:8000";
 
 async function cadastrarFarmacia() {
-    const nome = document.getElementById("nomeFarmacia").value;
-    const endereco = document.getElementById("enderecoFarmacia").value;
-    const telefone = document.getElementById("telefoneFarmacia").value;
-    const cnpj = document.getElementById("cnpjFarmacia").value;
+    const nome = document.getElementById("nome").value;
+    const endereco = document.getElementById("endereco").value;
+    const telefone = document.getElementById("telefone").value;
+    const cnpj = document.getElementById("cnpj").value;
 
     const data = { nome, endereco, telefone, cnpj };
 
-    const resp = await fetch("http://127.0.0.1:8000/farmacias/", {
+    const resp = await fetch(`${API}/farmacias/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
