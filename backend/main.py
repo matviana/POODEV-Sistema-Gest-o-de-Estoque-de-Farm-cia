@@ -54,6 +54,11 @@ def pagina_estoque(request: Request):
 def pagina_historico(request: Request):
     return templates.TemplateResponse("historico.html", {"request": request})
 
+@app.get("/frontend/ia", response_class=HTMLResponse)
+def frontend_ia(request: Request):
+    return templates.TemplateResponse("ia.html", {"request": request})
+
+
 
 
 

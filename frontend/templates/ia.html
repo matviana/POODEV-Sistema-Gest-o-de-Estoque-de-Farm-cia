@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>IA - Previsão de Demanda</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<h1>Previsão de Demanda (IA)</h1>
+
+<div class="container">
+
+    <h2>Treinar modelo geral</h2>
+    <label>Vendas mensais (12 valores separados por vírgula):</label>
+    <input id="vendas_geral" type="text" placeholder="10,20,30...">
+
+    <label>Eventos mensais (12 valores entre 0 e 1):</label>
+    <input id="eventos_geral" type="text" placeholder="0,1,0,2...">
+
+    <button onclick="treinarGeral()">Treinar Modelo Geral</button>
+
+    <hr>
+
+    <h2>Prever demanda geral (próximo mês)</h2>
+    <label>Últimos 3 meses (3 valores separados por vírgula):</label>
+    <input id="ultimos3_geral" type="text">
+
+    <label>Mês atual (1-12):</label>
+    <input id="mes_atual_geral" type="number">
+
+    <label>Intensidade do evento (0 a 1):</label>
+    <input id="evento_geral" type="number" step="0.1">
+
+    <button onclick="preverGeral()">Prever Demanda Geral</button>
+
+    <hr>
+
+    <h2>Treinar modelo por medicamento</h2>
+    <label>Nome do medicamento:</label>
+    <input id="nome_med_treinar" type="text">
+
+    <label>Vendas mensais (12 valores):</label>
+    <input id="vendas_med" type="text">
+
+    <label>Eventos mensais (12 valores):</label>
+    <input id="eventos_med" type="text">
+
+    <button onclick="treinarMedicamento()">Treinar Medicamento</button>
+
+    <hr>
+
+    <h2>Prever demanda por medicamento</h2>
+    <label>Nome do medicamento:</label>
+    <input id="nome_med_prever" type="text">
+
+    <label>Últimos 3 meses:</label>
+    <input id="ultimos3_med" type="text">
+
+    <label>Mês atual:</label>
+    <input id="mes_atual_med" type="number">
+
+    <label>Intensidade do evento:</label>
+    <input id="evento_med" type="number" step="0.1">
+
+    <button onclick="preverMedicamento()">Prever Medicamento</button>
+
+    <hr>
+
+    <h2>Resultado</h2>
+    <pre id="resultado"></pre>
+
+</div>
+
+<script src="/static/js/ia.js"></script>
+
+</body>
+</html>
