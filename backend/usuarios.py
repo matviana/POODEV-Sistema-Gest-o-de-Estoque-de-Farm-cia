@@ -3,7 +3,7 @@ class Usuario:
         self.id_usuario = id_usuario
         self.nome = nome
         self.email = email
-        self.senha = senha  # futuramente será armazenada com hash
+        self.senha = senha  
 
 class Administrador(Usuario):
     def __init__(self, id_usuario, nome, email, senha):
@@ -11,3 +11,5 @@ class Administrador(Usuario):
 
     def cadastrar_medicamento(self, estoque, medicamento):
         estoque.adicionar_medicamento(medicamento)
+
+

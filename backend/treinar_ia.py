@@ -6,4 +6,4 @@ eventos = [0.1, 0.3, 0.0, 0.2, 0.6, 0.8, 0.4, 0.1, 0.0, 0.7, 0.2, 0.3]
 ia = RedeNeuralDemanda()
 ia.treinar_com_eventos(vendas, eventos)
 
-print("Treinamento concluído!")
+print("Treinamento feito")

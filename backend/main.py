@@ -1,4 +1,4 @@
-from backend.database import criar_tabelas
+from backend.database import criar_tabelas 
 from backend.medicamentos import Medicamento
 from backend.farmacia import Farmacia
 from backend.estoque import Estoque
@@ -8,7 +8,13 @@ from backend.redeneural import RedeNeuralDemanda
 from datetime import date
 import os
 
-from fastapi import FastAPI
+# FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+
 
 # Routers
 from backend.routers.medicamentos_router import router as medicamentos_router
@@ -18,22 +24,33 @@ from backend.routers.farmacias_router import router as farmacias_router
 from backend.routers.ia_router import router as ia_router
 
 
-
 app = FastAPI(title="Sistema de Farmácia - API")
 
-# Registrar rotas
+
+app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+
+
+templates = Jinja2Templates(directory="frontend/templates")
+
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/medicamentos", response_class=HTMLResponse)
+def pagina_medicamentos(request: Request):
+    return templates.TemplateResponse("medicamentos.html", {"request": request})
+
+
 app.include_router(medicamentos_router)
 app.include_router(estoque_router)
 app.include_router(historico_router)
 app.include_router(farmacias_router)
 app.include_router(ia_router)
 
-
-
-@app.get("/")
+@app.get("/status")
 def root():
     return {"mensagem": "API funcionando!"}
-
 
 
 
