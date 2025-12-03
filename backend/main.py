@@ -277,7 +277,7 @@ def menu():
                     intensidade_evento=evento
                 )
 
-                print(f"\n📈 Previsão: {pred:.2f} unidades\n")
+                print(f"\n Previsão: {pred:.2f} unidades\n")
 
             except Exception as e:
                 print("Erro:", e)
